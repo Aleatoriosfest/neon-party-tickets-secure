@@ -7,9 +7,10 @@ interface ArtistCardProps {
   name: string;
   role: string;
   image: string;
+  description?: string;
 }
 
-const ArtistCard: React.FC<ArtistCardProps> = ({ name, role, image }) => {
+const ArtistCard: React.FC<ArtistCardProps> = ({ name, role, image, description }) => {
   return (
     <Card className="glass hover:border-neon-purple/50 transition-colors duration-300">
       <CardContent className="flex flex-col items-center p-6">
@@ -20,7 +21,10 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ name, role, image }) => {
           </AvatarFallback>
         </Avatar>
         <h3 className="text-xl font-bold text-white mb-1">{name}</h3>
-        <p className="text-sm text-neon-purple">{role}</p>
+        <p className="text-sm text-neon-purple mb-2">{role}</p>
+        {description && (
+          <p className="text-sm text-gray-300 text-center">{description}</p>
+        )}
       </CardContent>
     </Card>
   );

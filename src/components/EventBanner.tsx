@@ -8,9 +8,10 @@ interface EventBannerProps {
   date: string;
   location: string;
   image: string;
+  subtitle?: string;
 }
 
-const EventBanner: React.FC<EventBannerProps> = ({ title, date, location, image }) => {
+const EventBanner: React.FC<EventBannerProps> = ({ title, date, location, image, subtitle }) => {
   return (
     <div className="relative w-full h-[70vh] overflow-hidden rounded-lg">
       <div 
@@ -31,6 +32,9 @@ const EventBanner: React.FC<EventBannerProps> = ({ title, date, location, image 
           className="container mx-auto"
         >
           <h1 className="text-4xl md:text-6xl font-bold mb-2 neon-text">{title}</h1>
+          {subtitle && (
+            <h2 className="text-2xl md:text-3xl font-bold mb-2 text-neon-purple">{subtitle}</h2>
+          )}
           <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
             <div className="flex items-center">
               <svg className="w-5 h-5 mr-2 text-neon-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
