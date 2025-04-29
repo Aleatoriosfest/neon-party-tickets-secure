@@ -1,0 +1,133 @@
+
+import React, { useState, useEffect } from 'react';
+import { Button } from "@/components/ui/button";
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+
+interface EventBannerSliderProps {
+  title: string;
+  date: string;
+  location: string;
+  flyer: string;
+  subtitle?: string;
+  time?: string;
+  artistImages: string[];
+  venueImages: string[];
+}
+
+const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
+  title,
+  date,
+  location,
+  flyer,
+  subtitle,
+  time,
+  artistImages,
+  venueImages
+}) => {
+  const allSlides = [
+    { type: 'flyer', image: flyer },
+    ...artistImages.map(img => ({ type: 'artist', image: img })),
+    { type: 'neon', text: 'PROJETO X' },
+    ...venueImages.map(img => ({ type: 'venue', image: img })),
+  ];
+
+  return (
+    <div className="relative w-full h-[70vh] overflow-hidden rounded-lg">
+      <Carousel className="w-full h-full" opts={{ loop: true }}>
+        <CarouselContent className="h-full">
+          {allSlides.map((slide, index) => (
+            <CarouselItem key={index} className="h-full">
+              {slide.type === 'neon' ? (
+                <div className="relative w-full h-full flex items-center justify-center bg-dark">
+                  <motion.h1
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5 }}
+                    className="text-6xl md:text-8xl font-bold text-center"
+                    style={{
+                      textShadow: `
+                        0 0 5px #fff,
+                        0 0 10px #fff,
+                        0 0 20px #0ff,
+                        0 0 40px #0ff,
+                        0 0 80px #0ff
+                      `
+                    }}
+                  >
+                    {slide.text}
+                  </motion.h1>
+                </div>
+              ) : (
+                <div 
+                  className="absolute inset-0 bg-cover bg-center bg-no-repeat" 
+                  style={{ 
+                    backgroundImage: `url(${slide.image})`,
+                    filter: 'brightness(0.6)'
+                  }}
+                />
+              )}
+              
+              <div className="absolute inset-0 bg-gradient-to-t from-dark via-transparent to-transparent" />
+              
+              <div className="absolute bottom-0 left-0 w-full p-8 text-white">
+                <div className="container mx-auto">
+                  <h1 className="text-4xl md:text-6xl font-bold mb-2 neon-text">{title}</h1>
+                  {subtitle && (
+                    <h2 className="text-2xl md:text-3xl font-bold mb-2 text-neon-purple">{subtitle}</h2>
+                  )}
+                  <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
+                    <div className="flex items-center">
+                      <svg className="w-5 h-5 mr-2 text-neon-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                      </svg>
+                      <span className="text-xl">{date}</span>
+                      {time && <span className="text-xl ml-2">• {time}</span>}
+                    </div>
+                    <div className="flex items-center">
+                      <svg className="w-5 h-5 mr-2 text-neon-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      </svg>
+                      <span className="text-xl">{location}</span>
+                    </div>
+                  </div>
+                  <Button 
+                    size="lg" 
+                    className="bg-neon-blue hover:bg-neon-blue/80 text-black font-medium text-lg animate-pulse-neon"
+                  >
+                    Comprar Ingresso
+                  </Button>
+                </div>
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious className="left-4 bg-black/50 text-white border-neon-blue hover:bg-neon-blue hover:text-black" />
+        <CarouselNext className="right-4 bg-black/50 text-white border-neon-blue hover:bg-neon-blue hover:text-black" />
+      </Carousel>
+      
+      {/* Festa Logos */}
+      <div className="absolute bottom-24 right-8 flex gap-4">
+        <img 
+          src="public/lovable-uploads/76338d86-9bf8-4f21-9853-0af071d1c4a8.png" 
+          alt="Aleatórios Fest Logo" 
+          className="h-16 w-auto object-contain"
+        />
+        <img 
+          src="public/lovable-uploads/42202d9f-6a6a-4541-b446-225cbc122a53.png" 
+          alt="Element's Fest Logo" 
+          className="h-16 w-auto object-contain"
+        />
+      </div>
+    </div>
+  );
+};
+
+export default EventBannerSlider;

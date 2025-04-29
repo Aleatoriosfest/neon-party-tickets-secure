@@ -1,7 +1,7 @@
 
 import React from 'react';
 import Navbar from '@/components/Navbar';
-import EventBanner from '@/components/EventBanner';
+import EventBannerSlider from '@/components/EventBannerSlider';
 import EventHighlights from '@/components/EventHighlights';
 import ArtistSection from '@/components/ArtistSection';
 import LocationSection from '@/components/LocationSection';
@@ -12,6 +12,7 @@ import CountdownTimer from '@/components/CountdownTimer';
 import ArtistTimeline from '@/components/ArtistTimeline';
 import FAQSection from '@/components/FAQSection';
 import SocialShare from '@/components/SocialShare';
+import PixPayment from '@/components/PixPayment';
 
 const Index: React.FC = () => {
   const featuredEvent = {
@@ -28,9 +29,9 @@ const Index: React.FC = () => {
     "Carros de Som e Paredão",
     "Sorteio de Combos e Camisetas",
     "Venda de Bebidas no Local",
-    "Mulher: R$20 (com nome na lista)",
-    "Homem: R$30 (com nome na lista)",
-    "Homem: R$50 (sem nome na lista)"
+    "Mulher: R$20 (ingresso antecipado)",
+    "Homem: R$30 (ingresso antecipado)",
+    "Na porta: R$50 (para todos)"
   ];
   
   const artists = [
@@ -88,13 +89,20 @@ const Index: React.FC = () => {
     "public/lovable-uploads/4bf3e74e-28e6-4abe-a119-ab22358af8bf.png"
   ];
   
+  const artistImages = artists.map(artist => artist.image);
+  
   return (
     <div className="min-h-screen bg-dark">
       <Navbar />
       
-      {/* Banner Hero */}
+      {/* Banner Hero com Slides */}
       <section className="pt-16">
-        <EventBanner {...featuredEvent} />
+        <EventBannerSlider 
+          {...featuredEvent}
+          flyer={featuredEvent.image}
+          artistImages={artistImages}
+          venueImages={venuePhotos}
+        />
       </section>
       
       {/* Countdown Timer */}
@@ -108,6 +116,9 @@ const Index: React.FC = () => {
       
       {/* Artist Timeline */}
       <ArtistTimeline />
+      
+      {/* Pagamento via PIX */}
+      <PixPayment />
       
       {/* Local Info */}
       <LocationSection 
@@ -124,7 +135,10 @@ const Index: React.FC = () => {
       <FAQSection />
       
       {/* Social Share */}
-      <SocialShare instagramUrl="https://www.instagram.com/aleatorios_fest?igsh=Nnl0aTE0MzZyMXQ5" />
+      <SocialShare instagramUrls={[
+        "https://www.instagram.com/aleatorios_fest?igsh=Nnl0aTE0MzZyMXQ5",
+        "https://www.instagram.com/elementsfest1?igsh=M2Q4MDJvODNncHhl"
+      ]} />
       
       {/* CTA Section */}
       <CTASection />

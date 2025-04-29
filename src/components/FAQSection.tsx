@@ -16,24 +16,24 @@ interface FAQItem {
 const FAQSection: React.FC = () => {
   const faqs: FAQItem[] = [
     {
-      question: 'Qual é a idade mínima para entrar no evento?',
-      answer: 'A idade mínima para participar do evento é de 18 anos. Será necessário apresentar documento oficial com foto na entrada.'
-    },
-    {
       question: 'O que está incluso no valor do ingresso?',
       answer: 'O ingresso dá direito ao acesso ao evento e open bar. Confira nos destaques do evento os itens inclusos no open bar.'
     },
     {
-      question: 'Como faço para colocar meu nome na lista?',
-      answer: 'Para colocar seu nome na lista, entre em contato com um dos organizadores ou envie mensagem para o Instagram oficial do evento (@aleatorios_fest).'
+      question: 'Como faço para comprar ingressos antecipados?',
+      answer: 'Para comprar ingressos antecipados, utilize o botão "Comprar Ingressos" na página principal do site. O pagamento é feito via PIX.'
     },
     {
-      question: 'Haverá estacionamento no local?',
-      answer: 'Sim, o local disponibiliza estacionamento com vagas limitadas. Recomendamos chegar cedo para garantir seu lugar.'
+      question: 'Qual é o valor dos ingressos?',
+      answer: 'Mulher: R$20 (antecipado), Homem: R$30 (antecipado), Na porta: R$50.'
     },
     {
       question: 'É permitido entrar com comida ou bebida?',
       answer: 'Não é permitido entrar com alimentos ou bebidas externos. O evento conta com open bar e venda de bebidas adicionais no local.'
+    },
+    {
+      question: 'Posso transferir meu ingresso para outra pessoa?',
+      answer: 'Sim, os ingressos são transferíveis. Entre em contato com o suporte para realizar a transferência de titularidade.'
     }
   ];
   

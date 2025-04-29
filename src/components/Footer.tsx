@@ -12,7 +12,7 @@ const Footer: React.FC = () => {
             <p className="text-sm text-gray-400">© 2025 Todos os direitos reservados</p>
           </div>
           
-          <div className="flex items-center mb-4 md:mb-0">
+          <div className="flex flex-col md:flex-row gap-4 mb-4 md:mb-0">
             <a 
               href="https://www.instagram.com/aleatorios_fest?igsh=Nnl0aTE0MzZyMXQ5" 
               target="_blank" 
@@ -21,6 +21,16 @@ const Footer: React.FC = () => {
             >
               <Instagram size={20} />
               <span>@aleatorios_fest</span>
+            </a>
+            
+            <a 
+              href="https://www.instagram.com/elementsfest1?igsh=M2Q4MDJvODNncHhl" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-gray-400 hover:text-neon-blue transition-colors flex items-center gap-2"
+            >
+              <Instagram size={20} />
+              <span>@elementsfest1</span>
             </a>
           </div>
           
