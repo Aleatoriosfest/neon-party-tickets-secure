@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,6 +16,26 @@ const PixPayment: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState('pix');
   const [showQRCode, setShowQRCode] = useState(false);
   const pixKey = 'beatrizsilva8282@gmail.com'; // Chave PIX fornecida
+  
+  // Check if user is logged in
+  const currentUser = localStorage.getItem('currentUser') 
+    ? JSON.parse(localStorage.getItem('currentUser') || '{}') 
+    : null;
+    
+  // Load saved form data from session storage if available
+  useEffect(() => {
+    const savedFormData = sessionStorage.getItem('ticketFormData');
+    if (savedFormData) {
+      const formData = JSON.parse(savedFormData);
+      setTicketType(formData.ticketType || '');
+      setName(formData.name || '');
+      setEmail(formData.email || '');
+      setPhone(formData.phone || '');
+    } else if (currentUser) {
+      // Pre-fill email if user is logged in
+      setEmail(currentUser.email || '');
+    }
+  }, [currentUser]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,8 +50,30 @@ const PixPayment: React.FC = () => {
       toast.success('Pedido gerado com sucesso! Faça o pagamento para confirmar seu ingresso.');
     } else {
       // Em uma implementação completa, redirecionaria para o gateway de pagamento
-      toast.info('Implementação de cartão de crédito em desenvolvimento');
+      toast.info('Implementação de cartão de crédito em breve disponível!');
     }
+  };
+  
+  // Save form data and redirect to login
+  const saveFormDataAndRedirect = () => {
+    const formData = {
+      ticketType,
+      name,
+      email,
+      phone
+    };
+    
+    sessionStorage.setItem('ticketFormData', JSON.stringify(formData));
+    sessionStorage.setItem('redirectAfterLogin', window.location.href + '#comprar');
+    
+    toast.info('Você precisa estar logado para prosseguir com o pagamento');
+    setTimeout(() => {
+      // Trigger the login modal by clicking the login button
+      const loginButton = document.querySelector('[data-login-button="true"]') as HTMLElement;
+      if (loginButton) {
+        loginButton.click();
+      }
+    }, 1000);
   };
   
   const ticketPrice = ticketType === 'female' ? 'R$20' : ticketType === 'male' ? 'R$30' : '';
@@ -69,7 +111,7 @@ const PixPayment: React.FC = () => {
                 <form className="space-y-6">
                   <div>
                     <label className="block text-white mb-2">Tipo de Ingresso</label>
-                    <Select onValueChange={(value) => setTicketType(value)}>
+                    <Select onValueChange={(value) => setTicketType(value)} value={ticketType}>
                       <SelectTrigger className="bg-dark-gray border-light-gray text-white">
                         <SelectValue placeholder="Selecione o tipo de ingresso" />
                       </SelectTrigger>
@@ -119,6 +161,14 @@ const PixPayment: React.FC = () => {
                         toast.error('Por favor, preencha todos os campos');
                         return;
                       }
+                      
+                      // Check if user is logged in
+                      if (!currentUser) {
+                        saveFormDataAndRedirect();
+                        return;
+                      }
+                      
+                      // User is logged in, proceed to payment tab
                       const pagamentoTab = document.querySelector('[data-value="pagamento"]') as HTMLElement;
                       if (pagamentoTab) {
                         pagamentoTab.click();
@@ -221,7 +271,7 @@ const PixPayment: React.FC = () => {
               <div className="flex items-center justify-center bg-black p-2 mb-4 rounded">
                 <div className="w-48 h-48 bg-white flex items-center justify-center relative">
                   {/* QR Code estático para demonstração - em produção seria um QR dinâmico */}
-                  <div className="w-full h-full bg-[url('data:image/png;base64,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')]"></div>
+                  <div className="w-full h-full bg-[url('data:image/png;base64,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')]"></div>
                   <div className="absolute inset-0 flex items-center justify-center">
                     <QrCode size={80} className="text-blue-500 opacity-50" />
                   </div>

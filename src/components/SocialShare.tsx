@@ -52,7 +52,7 @@ const SocialShare: React.FC<SocialShareProps> = ({
         </div>
         
         <div className="mt-6">
-          <p className="text-white">Use a hashtag <span className="text-neon-purple font-bold">#ProjetoXFest</span> nas suas fotos!</p>
+          <p className="text-white">Use a hashtag <span className="text-neon-purple font-bold">#AleatoriosFest</span> nas suas fotos!</p>
         </div>
       </div>
     </section>
