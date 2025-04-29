@@ -1,7 +1,7 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Carousel,
   CarouselContent,
@@ -40,6 +40,15 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
 
   return (
     <div className="relative w-full h-[70vh] overflow-hidden rounded-lg">
+      {/* Static background - prevents blank screen during carousel load */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat" 
+        style={{ 
+          backgroundImage: `url(${flyer})`,
+          filter: 'brightness(0.6)'
+        }}
+      />
+      
       <Carousel className="w-full h-full" opts={{ loop: true }}>
         <CarouselContent className="h-full">
           {allSlides.map((slide, index) => (
@@ -116,12 +125,12 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
       {/* Festa Logos */}
       <div className="absolute bottom-24 right-8 flex gap-4">
         <img 
-          src="public/lovable-uploads/76338d86-9bf8-4f21-9853-0af071d1c4a8.png" 
+          src="/lovable-uploads/76338d86-9bf8-4f21-9853-0af071d1c4a8.png" 
           alt="Aleatórios Fest Logo" 
           className="h-16 w-auto object-contain"
         />
         <img 
-          src="public/lovable-uploads/42202d9f-6a6a-4541-b446-225cbc122a53.png" 
+          src="/lovable-uploads/42202d9f-6a6a-4541-b446-225cbc122a53.png" 
           alt="Element's Fest Logo" 
           className="h-16 w-auto object-contain"
         />
