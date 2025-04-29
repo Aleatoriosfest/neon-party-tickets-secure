@@ -119,10 +119,7 @@ const PixPayment: React.FC = () => {
                         toast.error('Por favor, preencha todos os campos');
                         return;
                       }
-                      const pagamentoTab = document.querySelector('[data-value="pagamento"]') as HTMLElement;
-                      if (pagamentoTab) {
-                        pagamentoTab.click();
-                      }
+                      document.querySelector('[data-value="pagamento"]')?.click();
                     }}
                   >
                     Continuar para Pagamento
@@ -179,12 +176,7 @@ const PixPayment: React.FC = () => {
                     <Button 
                       variant="outline" 
                       className="flex-1 border-gray-500 text-gray-300 hover:bg-gray-700"
-                      onClick={() => {
-                        const dadosTab = document.querySelector('[data-value="dados"]') as HTMLElement;
-                        if (dadosTab) {
-                          dadosTab.click();
-                        }
-                      }}
+                      onClick={() => document.querySelector('[data-value="dados"]')?.click()}
                     >
                       Voltar
                     </Button>
