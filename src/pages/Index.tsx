@@ -8,6 +8,10 @@ import LocationSection from '@/components/LocationSection';
 import PhotoGallery from '@/components/PhotoGallery';
 import CTASection from '@/components/CTASection';
 import Footer from '@/components/Footer';
+import CountdownTimer from '@/components/CountdownTimer';
+import ArtistTimeline from '@/components/ArtistTimeline';
+import FAQSection from '@/components/FAQSection';
+import SocialShare from '@/components/SocialShare';
 
 const Index: React.FC = () => {
   const featuredEvent = {
@@ -93,11 +97,17 @@ const Index: React.FC = () => {
         <EventBanner {...featuredEvent} />
       </section>
       
+      {/* Countdown Timer */}
+      <CountdownTimer targetDate="2025-05-31T16:00:00" />
+      
       {/* Event Highlights */}
       <EventHighlights highlights={eventHighlights} />
       
       {/* Artists */}
       <ArtistSection artists={artists} />
+      
+      {/* Artist Timeline */}
+      <ArtistTimeline />
       
       {/* Local Info */}
       <LocationSection 
@@ -109,6 +119,12 @@ const Index: React.FC = () => {
       <section className="py-10 container mx-auto px-4">
         <PhotoGallery photos={venuePhotos} title="Fotos do Local" />
       </section>
+      
+      {/* FAQ Section */}
+      <FAQSection />
+      
+      {/* Social Share */}
+      <SocialShare instagramUrl="https://www.instagram.com/aleatorios_fest?igsh=Nnl0aTE0MzZyMXQ5" />
       
       {/* CTA Section */}
       <CTASection />
