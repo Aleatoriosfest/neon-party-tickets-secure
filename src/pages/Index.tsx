@@ -1,10 +1,10 @@
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import EventBanner from '@/components/EventBanner';
 import EventCard from '@/components/EventCard';
 import ArtistCard from '@/components/ArtistCard';
-import PhotoGallery from '@/components/PhotoGallery';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -12,8 +12,7 @@ const Index: React.FC = () => {
   const featuredEvent = {
     title: "PROJETO X",
     subtitle: "Aleatorios Fest x Element's Fest",
-    date: "31 de Maio, 2025",
-    time: "16:00 às 00:00",
+    date: "31 de Maio, 2025 • 16:00 às 00:00",
     location: "Chácara Monero, Osasco - SP",
     image: "public/lovable-uploads/7167fe07-a100-48a7-9d4e-ef3e91237dd1.png"
   };
@@ -83,17 +82,6 @@ const Index: React.FC = () => {
     "Mulher: R$20 (com nome na lista)",
     "Homem: R$30 (com nome na lista)",
     "Homem: R$50 (sem nome na lista)"
-  ];
-  
-  const venuePhotos = [
-    "public/lovable-uploads/7167fe07-a100-48a7-9d4e-ef3e91237dd1.png",
-    "public/lovable-uploads/9261fd76-402b-4aee-b73b-fcaf4f396c03.png",
-    "public/lovable-uploads/0fa98cf1-cff5-49fd-8709-5417fc6838a9.png",
-    "public/lovable-uploads/9bb4eefd-69a5-4c24-8703-d7d7827455fb.png",
-    "public/lovable-uploads/f4ab4706-3eb6-4041-bef7-5b41bf79ede2.png",
-    "public/lovable-uploads/cb1194d7-2a0c-4747-a307-23c02b66b55d.png",
-    "public/lovable-uploads/cc64f665-9293-4b72-b9ec-0e086767e5d8.png",
-    "public/lovable-uploads/66e7124c-142d-48aa-804a-bc0dd6b9cb6b.png"
   ];
   
   return (
@@ -184,11 +172,6 @@ const Index: React.FC = () => {
             ></iframe>
           </div>
         </div>
-      </section>
-      
-      {/* Photo Gallery */}
-      <section className="py-10 container mx-auto px-4">
-        <PhotoGallery photos={venuePhotos} />
       </section>
       
       {/* CTA Section */}
