@@ -27,7 +27,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
         transition={{ duration: 0.5 }}
         className="text-3xl font-bold text-white mb-6"
       >
-        {title}
+        {title} <span className="neon-text">do Evento</span>
       </motion.h2>
 
       <Carousel
@@ -51,7 +51,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
               >
                 <img
                   src={photo}
-                  alt={`Foto do local ${index + 1}`}
+                  alt={`Foto do evento ${index + 1}`}
                   className={cn(
                     "w-full h-full object-cover transition-transform duration-500",
                     "hover:scale-110"
