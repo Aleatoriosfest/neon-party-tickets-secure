@@ -35,8 +35,6 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
     { type: 'flyer', image: flyer },
     { type: 'logo', image: '/lovable-uploads/76338d86-9bf8-4f21-9853-0af071d1c4a8.png', name: 'Aleatórios Fest' },
     { type: 'logo', image: '/lovable-uploads/42202d9f-6a6a-4541-b446-225cbc122a53.png', name: 'Element\'s Fest' },
-    { type: 'neon', text: 'PROJETO X' },
-    ...artistImages.map(img => ({ type: 'artist', image: img })),
     ...venueImages.map(img => ({ type: 'venue', image: img })),
   ];
 
@@ -51,31 +49,11 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
         }}
       />
       
-      <Carousel className="w-full h-full" opts={{ loop: true }}>
+      <Carousel className="w-full h-full" opts={{ loop: true, skipSnaps: false, duration: 1000 }}>
         <CarouselContent className="h-full">
           {allSlides.map((slide, index) => (
-            <CarouselItem key={index} className="h-full">
-              {slide.type === 'neon' ? (
-                <div className="relative w-full h-full flex items-center justify-center bg-dark">
-                  <motion.h1
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5 }}
-                    className="text-6xl md:text-8xl font-bold text-center"
-                    style={{
-                      textShadow: `
-                        0 0 5px #fff,
-                        0 0 10px #fff,
-                        0 0 20px #0ff,
-                        0 0 40px #0ff,
-                        0 0 80px #0ff
-                      `
-                    }}
-                  >
-                    {slide.text}
-                  </motion.h1>
-                </div>
-              ) : slide.type === 'logo' ? (
+            <CarouselItem key={index} className="h-full w-full">
+              {slide.type === 'logo' ? (
                 <div className="relative w-full h-full flex items-center justify-center bg-dark">
                   <div className="absolute inset-0 bg-gradient-to-t from-dark via-transparent to-transparent" />
                   <motion.div
