@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { Button } from "@/components/ui/button";
 import { motion } from 'framer-motion';
 import {
@@ -34,34 +34,12 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
   // Adicionando os novos flyers aos slides
   const allSlides = [
     { type: 'flyer', image: flyer },
-    { type: 'flyer', image: '/lovable-uploads/4c228da6-5ce6-49ab-a66e-e2dede8cb2c7.png', name: 'Element\'s Fest' },
-    { type: 'flyer', image: '/lovable-uploads/92a27832-ea11-4929-974e-06e0cd29c6eb.png', name: 'Aleatórios Fest' },
+    { type: 'flyer', image: '/lovable-uploads/78f4dbdf-b51f-43e7-8fe2-9399cc58d9e2.png', name: 'Element\'s Fest' },
+    { type: 'flyer', image: '/lovable-uploads/f693fccb-06ec-449e-a5e7-c2e7989fe247.png', name: 'Aleatórios Fest' },
     { type: 'logo', image: '/lovable-uploads/76338d86-9bf8-4f21-9853-0af071d1c4a8.png', name: 'Aleatórios Fest' },
     { type: 'logo', image: '/lovable-uploads/42202d9f-6a6a-4541-b446-225cbc122a53.png', name: 'Element\'s Fest' },
     ...venueImages.map(img => ({ type: 'venue', image: img })),
   ];
-
-  const carouselRef = useRef<HTMLDivElement>(null);
-
-  const handleComprarClick = () => {
-    const element = document.getElementById('comprar');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    // Check if user is logged in
-    const currentUser = localStorage.getItem('currentUser');
-    if (!currentUser) {
-      // Save that we need to redirect to payment section after login
-      sessionStorage.setItem('redirectAfterLogin', window.location.href + '#comprar');
-      
-      // Trigger the login modal
-      const loginButton = document.querySelector('[data-login-button="true"]') as HTMLElement;
-      if (loginButton) {
-        loginButton.click();
-      }
-    }
-  };
 
   return (
     <div className="relative w-full h-[70vh] overflow-hidden rounded-lg">
@@ -151,7 +129,12 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
                   <Button 
                     size="lg" 
                     className="bg-neon-blue hover:bg-neon-blue/80 text-black font-medium text-lg animate-pulse-neon"
-                    onClick={handleComprarClick}
+                    onClick={() => {
+                      const element = document.getElementById('comprar');
+                      if (element) {
+                        element.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    }}
                   >
                     Comprar Ingresso
                   </Button>
