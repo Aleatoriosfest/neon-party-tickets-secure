@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Instagram } from 'lucide-react';
+import { Instagram, Facebook, Twitter, Mail } from 'lucide-react';
 
 const Footer: React.FC = () => {
   return (
@@ -32,16 +32,37 @@ const Footer: React.FC = () => {
               <Instagram size={20} />
               <span>@elementsfest1</span>
             </a>
+            
+            <a 
+              href="https://www.facebook.com/aleatoriosfest" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-gray-400 hover:text-neon-blue transition-colors flex items-center gap-2"
+            >
+              <Facebook size={20} />
+              <span>Facebook</span>
+            </a>
+            
+            <a 
+              href="https://twitter.com/aleatoriosfest" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-gray-400 hover:text-neon-blue transition-colors flex items-center gap-2"
+            >
+              <Twitter size={20} />
+              <span>Twitter</span>
+            </a>
           </div>
           
-          <div className="flex space-x-6">
-            <a href="#" className="text-gray-400 hover:text-neon-blue">
+          <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-6">
+            <a href="/politica-privacidade" className="text-gray-400 hover:text-neon-blue">
               Política de Privacidade
             </a>
-            <a href="#" className="text-gray-400 hover:text-neon-blue">
+            <a href="/termos-uso" className="text-gray-400 hover:text-neon-blue">
               Termos de Uso
             </a>
-            <a href="#" className="text-gray-400 hover:text-neon-blue">
+            <a href="mailto:contato@aleatoriosfest.com" className="text-gray-400 hover:text-neon-blue flex items-center gap-1">
+              <Mail size={16} />
               Contato
             </a>
           </div>

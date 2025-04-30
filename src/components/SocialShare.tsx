@@ -1,17 +1,21 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Instagram } from 'lucide-react';
+import { Instagram, Facebook, Twitter } from 'lucide-react';
 
 interface SocialShareProps {
   instagramUrls?: string[];
+  facebookUrl?: string;
+  twitterUrl?: string;
 }
 
 const SocialShare: React.FC<SocialShareProps> = ({ 
   instagramUrls = [
     "https://www.instagram.com/aleatorios_fest?igsh=Nnl0aTE0MzZyMXQ5",
     "https://www.instagram.com/elementsfest1?igsh=M2Q4MDJvODNncHhl"
-  ] 
+  ],
+  facebookUrl = "https://www.facebook.com/aleatoriosfest",
+  twitterUrl = "https://twitter.com/aleatoriosfest"
 }) => {
   return (
     <section className="py-10 container mx-auto px-4">
@@ -49,6 +53,30 @@ const SocialShare: React.FC<SocialShareProps> = ({
               </motion.a>
             );
           })}
+
+          <motion.a
+            href={facebookUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-800 text-white px-6 py-3 rounded-full"
+          >
+            <Facebook className="h-6 w-6" />
+            <span>Facebook</span>
+          </motion.a>
+          
+          <motion.a
+            href={twitterUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center gap-2 bg-gradient-to-r from-blue-400 to-blue-600 text-white px-6 py-3 rounded-full"
+          >
+            <Twitter className="h-6 w-6" />
+            <span>Twitter</span>
+          </motion.a>
         </div>
         
         <div className="mt-6">

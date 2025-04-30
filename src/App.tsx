@@ -25,6 +25,12 @@ const App = () => {
                 <Route path="/" element={<Index />} />
                 <Route path="/meus-ingressos" element={<MyTickets />} />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/payment-success" element={<Index />} />
+                <Route path="/payment-canceled" element={<Index />} />
+                <Route path="/politica-privacidade" element={<Index />} />
+                <Route path="/termos-uso" element={<Index />} />
+                <Route path="/eventos" element={<Index />} />
+                <Route path="/sobre" element={<Index />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

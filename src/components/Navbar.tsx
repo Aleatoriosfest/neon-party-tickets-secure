@@ -103,6 +103,7 @@ const Navbar: React.FC = () => {
                 size="sm" 
                 className="hidden md:flex border-neon-blue text-neon-blue hover:bg-neon-blue hover:text-black"
                 onClick={() => setShowLoginModal(true)}
+                data-login-button="true"
               >
                 Entrar
               </Button>
