@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { motion } from 'framer-motion';
 import {
@@ -33,10 +33,8 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
 }) => {
   const allSlides = [
     { type: 'flyer', image: flyer },
-    { type: 'logo', image: '/lovable-uploads/76338d86-9bf8-4f21-9853-0af071d1c4a8.png', name: 'Aleatórios Fest' },
-    { type: 'logo', image: '/lovable-uploads/42202d9f-6a6a-4541-b446-225cbc122a53.png', name: 'Element\'s Fest' },
-    { type: 'neon', text: 'PROJETO X' },
     ...artistImages.map(img => ({ type: 'artist', image: img })),
+    { type: 'neon', text: 'PROJETO X' },
     ...venueImages.map(img => ({ type: 'venue', image: img })),
   ];
 
@@ -75,23 +73,6 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
                     {slide.text}
                   </motion.h1>
                 </div>
-              ) : slide.type === 'logo' ? (
-                <div className="relative w-full h-full flex items-center justify-center bg-dark">
-                  <div className="absolute inset-0 bg-gradient-to-t from-dark via-transparent to-transparent" />
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="z-10 flex flex-col items-center"
-                  >
-                    <img 
-                      src={slide.image} 
-                      alt={slide.name} 
-                      className="max-h-[40vh] max-w-[80%] object-contain mb-6"
-                    />
-                    <h2 className="text-4xl text-white font-bold neon-text">{slide.name}</h2>
-                  </motion.div>
-                </div>
               ) : (
                 <div 
                   className="absolute inset-0 bg-cover bg-center bg-no-repeat" 
@@ -129,12 +110,6 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
                   <Button 
                     size="lg" 
                     className="bg-neon-blue hover:bg-neon-blue/80 text-black font-medium text-lg animate-pulse-neon"
-                    onClick={() => {
-                      const element = document.getElementById('comprar');
-                      if (element) {
-                        element.scrollIntoView({ behavior: 'smooth' });
-                      }
-                    }}
                   >
                     Comprar Ingresso
                   </Button>
@@ -146,6 +121,20 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
         <CarouselPrevious className="left-4 bg-black/50 text-white border-neon-blue hover:bg-neon-blue hover:text-black" />
         <CarouselNext className="right-4 bg-black/50 text-white border-neon-blue hover:bg-neon-blue hover:text-black" />
       </Carousel>
+      
+      {/* Festa Logos */}
+      <div className="absolute bottom-24 right-8 flex gap-4">
+        <img 
+          src="/lovable-uploads/76338d86-9bf8-4f21-9853-0af071d1c4a8.png" 
+          alt="Aleatórios Fest Logo" 
+          className="h-16 w-auto object-contain"
+        />
+        <img 
+          src="/lovable-uploads/42202d9f-6a6a-4541-b446-225cbc122a53.png" 
+          alt="Element's Fest Logo" 
+          className="h-16 w-auto object-contain"
+        />
+      </div>
     </div>
   );
 };
