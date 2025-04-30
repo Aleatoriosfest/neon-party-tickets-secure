@@ -31,8 +31,11 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
   artistImages,
   venueImages
 }) => {
+  // Adicionando os novos flyers aos slides
   const allSlides = [
     { type: 'flyer', image: flyer },
+    { type: 'flyer', image: '/lovable-uploads/78f4dbdf-b51f-43e7-8fe2-9399cc58d9e2.png', name: 'Element\'s Fest' },
+    { type: 'flyer', image: '/lovable-uploads/f693fccb-06ec-449e-a5e7-c2e7989fe247.png', name: 'Aleatórios Fest' },
     { type: 'logo', image: '/lovable-uploads/76338d86-9bf8-4f21-9853-0af071d1c4a8.png', name: 'Aleatórios Fest' },
     { type: 'logo', image: '/lovable-uploads/42202d9f-6a6a-4541-b446-225cbc122a53.png', name: 'Element\'s Fest' },
     ...venueImages.map(img => ({ type: 'venue', image: img })),
@@ -49,7 +52,15 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
         }}
       />
       
-      <Carousel className="w-full h-full" opts={{ loop: true, skipSnaps: false, duration: 1000 }}>
+      <Carousel 
+        className="w-full h-full" 
+        opts={{ 
+          loop: true, 
+          skipSnaps: false, 
+          duration: 800,
+          align: "start",
+        }}
+      >
         <CarouselContent className="h-full">
           {allSlides.map((slide, index) => (
             <CarouselItem key={index} className="h-full w-full">
@@ -59,6 +70,7 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
                     transition={{ duration: 0.5 }}
                     className="z-10 flex flex-col items-center"
                   >
@@ -71,7 +83,11 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
                   </motion.div>
                 </div>
               ) : (
-                <div 
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
                   className="absolute inset-0 bg-cover bg-center bg-no-repeat" 
                   style={{ 
                     backgroundImage: `url(${slide.image})`,
@@ -82,7 +98,13 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
               
               <div className="absolute inset-0 bg-gradient-to-t from-dark via-transparent to-transparent" />
               
-              <div className="absolute bottom-0 left-0 w-full p-8 text-white">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="absolute bottom-0 left-0 w-full p-8 text-white"
+              >
                 <div className="container mx-auto">
                   <h1 className="text-4xl md:text-6xl font-bold mb-2 neon-text">{title}</h1>
                   {subtitle && (
@@ -117,7 +139,7 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
                     Comprar Ingresso
                   </Button>
                 </div>
-              </div>
+              </motion.div>
             </CarouselItem>
           ))}
         </CarouselContent>
