@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -33,6 +34,20 @@ const PixPayment: React.FC = () => {
     } else if (currentUser) {
       // Pre-fill email if user is logged in
       setEmail(currentUser.email || '');
+      setName(currentUser.name || '');
+    }
+    
+    // Check URL hash to open the correct tab
+    if (window.location.hash === '#comprar' && !currentUser) {
+      // If user is not logged in, trigger login modal
+      const loginButton = document.querySelector('[data-login-button="true"]') as HTMLElement;
+      if (loginButton) {
+        toast.info('Você precisa estar logado para comprar ingressos');
+        sessionStorage.setItem('redirectAfterLogin', window.location.href + '#comprar');
+        setTimeout(() => {
+          loginButton.click();
+        }, 1000);
+      }
     }
   }, [currentUser]);
 
@@ -41,6 +56,12 @@ const PixPayment: React.FC = () => {
     
     if (!ticketType || !name || !email || !phone) {
       toast.error('Por favor, preencha todos os campos');
+      return;
+    }
+    
+    // Verify user is logged in before continuing
+    if (!currentUser) {
+      saveFormDataAndRedirect();
       return;
     }
     
@@ -73,6 +94,25 @@ const PixPayment: React.FC = () => {
         loginButton.click();
       }
     }, 1000);
+  };
+
+  const handleContinueToPayment = () => {
+    if (!ticketType || !name || !email || !phone) {
+      toast.error('Por favor, preencha todos os campos');
+      return;
+    }
+    
+    // Check if user is logged in
+    if (!currentUser) {
+      saveFormDataAndRedirect();
+      return;
+    }
+    
+    // User is logged in, proceed to payment tab
+    const pagamentoTab = document.querySelector('[data-value="pagamento"]') as HTMLElement;
+    if (pagamentoTab) {
+      pagamentoTab.click();
+    }
   };
   
   const ticketPrice = ticketType === 'female' ? 'R$20' : ticketType === 'male' ? 'R$30' : '';
@@ -155,24 +195,7 @@ const PixPayment: React.FC = () => {
                   <Button 
                     type="button"
                     className="w-full bg-neon-blue hover:bg-neon-blue/80 text-black font-bold"
-                    onClick={() => {
-                      if (!ticketType || !name || !email || !phone) {
-                        toast.error('Por favor, preencha todos os campos');
-                        return;
-                      }
-                      
-                      // Check if user is logged in
-                      if (!currentUser) {
-                        saveFormDataAndRedirect();
-                        return;
-                      }
-                      
-                      // User is logged in, proceed to payment tab
-                      const pagamentoTab = document.querySelector('[data-value="pagamento"]') as HTMLElement;
-                      if (pagamentoTab) {
-                        pagamentoTab.click();
-                      }
-                    }}
+                    onClick={handleContinueToPayment}
                   >
                     Continuar para Pagamento
                   </Button>
