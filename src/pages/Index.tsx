@@ -21,7 +21,7 @@ const Index: React.FC = () => {
     date: "31 de Maio, 2025",
     time: "16:00 às 00:00",
     location: "Chácara Monero, Osasco - SP",
-    image: "public/lovable-uploads/7167fe07-a100-48a7-9d4e-ef3e91237dd1.png"
+    image: "/lovable-uploads/7167fe07-a100-48a7-9d4e-ef3e91237dd1.png"
   };
   
   const eventHighlights = [
@@ -98,7 +98,11 @@ const Index: React.FC = () => {
       {/* Banner Hero com Slides */}
       <section className="pt-16">
         <EventBannerSlider 
-          {...featuredEvent}
+          title={featuredEvent.title}
+          subtitle={featuredEvent.subtitle}
+          date={featuredEvent.date}
+          time={featuredEvent.time}
+          location={featuredEvent.location}
           flyer={featuredEvent.image}
           artistImages={artistImages}
           venueImages={venuePhotos}
