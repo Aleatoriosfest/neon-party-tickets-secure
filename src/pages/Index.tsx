@@ -16,7 +16,7 @@ import PixPayment from '@/components/PixPayment';
 
 const Index: React.FC = () => {
   const featuredEvent = {
-    title: "ALEATÓRIOS FEST",
+    title: "PROJETO X",
     subtitle: "Aleatorios Fest x Element's Fest",
     date: "31 de Maio, 2025",
     time: "16:00 às 00:00",
