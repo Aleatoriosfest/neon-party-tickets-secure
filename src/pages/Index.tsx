@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import EventBannerSlider from '@/components/EventBannerSlider';
@@ -38,7 +37,7 @@ const Index: React.FC = () => {
     {
       name: "DJ Buzato",
       role: "DJ",
-      image: "public/lovable-uploads/9261fd76-402b-4aee-b73b-fcaf4f396c03.png",
+      image: "/lovable-uploads/9261fd76-402b-4aee-b73b-fcaf4f396c03.png",
       description: "Atração Confirmada"
     },
     {
@@ -80,13 +79,13 @@ const Index: React.FC = () => {
   ];
   
   const venuePhotos = [
-    "public/lovable-uploads/9b5040f4-3d9b-431b-9528-0a6e0552d820.png",
-    "public/lovable-uploads/1f4c116a-2467-4107-97a1-4b397d9ca8dd.png",
-    "public/lovable-uploads/27f85bf7-0910-4968-8bbd-70116f2445b4.png",
-    "public/lovable-uploads/fdb76549-81d9-4887-ac8f-2601d25c76ff.png",
-    "public/lovable-uploads/870304d1-530e-4ea0-87f8-4289cf656d78.png",
-    "public/lovable-uploads/31f8a26d-bdbb-4ba8-8e99-6774edc2d5be.png",
-    "public/lovable-uploads/4bf3e74e-28e6-4abe-a119-ab22358af8bf.png"
+    "/lovable-uploads/9b5040f4-3d9b-431b-9528-0a6e0552d820.png",
+    "/lovable-uploads/1f4c116a-2467-4107-97a1-4b397d9ca8dd.png",
+    "/lovable-uploads/27f85bf7-0910-4968-8bbd-70116f2445b4.png",
+    "/lovable-uploads/fdb76549-81d9-4887-ac8f-2601d25c76ff.png",
+    "/lovable-uploads/870304d1-530e-4ea0-87f8-4289cf656d78.png",
+    "/lovable-uploads/31f8a26d-bdbb-4ba8-8e99-6774edc2d5be.png",
+    "/lovable-uploads/4bf3e74e-28e6-4abe-a119-ab22358af8bf.png"
   ];
   
   const artistImages = artists.map(artist => artist.image);
