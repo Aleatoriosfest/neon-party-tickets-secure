@@ -2,6 +2,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 interface EventBannerSliderProps {
   title: string;
@@ -26,7 +33,6 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const [imagesLoaded, setImagesLoaded] = useState<boolean[]>([false, false, false]);
   
   // Our carousel images
   const carouselImages = [
@@ -34,24 +40,6 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
     { type: 'flyer', image: '/lovable-uploads/de50cc19-19d3-44a1-bf48-7a14dcc3a803.png', name: 'Element\'s Fest Projeto X' },
     { type: 'flyer', image: '/lovable-uploads/f47b2c1d-b605-469f-a0e1-ea3d73c3ef25.png', name: 'Aleatórios Fest Projeto X' },
   ];
-
-  // Preload images to avoid black screen
-  useEffect(() => {
-    const preloadImages = () => {
-      const loadedStates = [...imagesLoaded];
-      
-      carouselImages.forEach((item, index) => {
-        const img = new Image();
-        img.src = item.image;
-        img.onload = () => {
-          loadedStates[index] = true;
-          setImagesLoaded([...loadedStates]);
-        };
-      });
-    };
-    
-    preloadImages();
-  }, []);
   
   // Auto rotate carousel every 5 seconds
   useEffect(() => {
@@ -109,22 +97,18 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
       {/* Carousel */}
       <div className="relative w-full h-full">
         <AnimatePresence initial={false}>
-          {carouselImages.map((image, index) => (
-            index === currentIndex && (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.8, ease: "easeInOut" }}
-                className="absolute inset-0 bg-cover bg-center bg-no-repeat rounded-lg"
-                style={{ 
-                  backgroundImage: `url(${image.image})`,
-                  filter: 'brightness(0.7)'
-                }}
-              />
-            )
-          ))}
+          <motion.div
+            key={currentIndex}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat rounded-lg"
+            style={{ 
+              backgroundImage: `url(${carouselImages[currentIndex].image})`,
+              filter: 'brightness(0.7)'
+            }}
+          />
         </AnimatePresence>
         
         {/* Overlay gradient */}
