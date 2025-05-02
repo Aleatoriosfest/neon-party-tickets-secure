@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import EventBannerSlider from '@/components/EventBannerSlider';
@@ -43,37 +44,37 @@ const Index: React.FC = () => {
     {
       name: "Tio Reh",
       role: "O Brabo do Passinho",
-      image: "public/lovable-uploads/0fa98cf1-cff5-49fd-8709-5417fc6838a9.png",
+      image: "/lovable-uploads/0fa98cf1-cff5-49fd-8709-5417fc6838a9.png",
       description: "Atração Confirmada"
     },
     {
       name: "DJ EZ Da Z/O",
       role: "O Mago",
-      image: "public/lovable-uploads/9bb4eefd-69a5-4c24-8703-d7d7827455fb.png",
+      image: "/lovable-uploads/9bb4eefd-69a5-4c24-8703-d7d7827455fb.png",
       description: "Atração Confirmada" 
     },
     {
       name: "DJ Luís ZL",
       role: "DJ",
-      image: "public/lovable-uploads/f4ab4706-3eb6-4041-bef7-5b41bf79ede2.png",
+      image: "/lovable-uploads/f4ab4706-3eb6-4041-bef7-5b41bf79ede2.png",
       description: "Atração Confirmada"
     },
     {
       name: "DJ Arthur ZL",
       role: "Tá Tocando pras Gustosa",
-      image: "public/lovable-uploads/cb1194d7-2a0c-4747-a307-23c02b66b55d.png",
+      image: "/lovable-uploads/cb1194d7-2a0c-4747-a307-23c02b66b55d.png",
       description: "Ritmo dos Fluxos"
     },
     {
       name: "DJ Pereira 011",
       role: "Trem Bala",
-      image: "public/lovable-uploads/cc64f665-9293-4b72-b9ec-0e086767e5d8.png",
+      image: "/lovable-uploads/cc64f665-9293-4b72-b9ec-0e086767e5d8.png",
       description: "Da Putaria" 
     },
     {
       name: "Tequileira Branquinha",
       role: "Show",
-      image: "public/lovable-uploads/66e7124c-142d-48aa-804a-bc0dd6b9cb6b.png",
+      image: "/lovable-uploads/66e7124c-142d-48aa-804a-bc0dd6b9cb6b.png",
       description: "Atração Confirmada"
     }
   ];
@@ -88,7 +89,7 @@ const Index: React.FC = () => {
     "/lovable-uploads/4bf3e74e-28e6-4abe-a119-ab22358af8bf.png"
   ];
   
-  const artistImages = artists.map(artist => artist.image);
+  const artistImages = artists.map(artist => artist.image.replace('public/', ''));
   
   return (
     <div className="min-h-screen bg-dark">

@@ -26,9 +26,9 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const [imagesLoaded, setImagesLoaded] = useState<boolean[]>([false, false, false]);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
   
-  // Our carousel images
+  // Our carousel images - fixing the paths by removing "public/" prefix
   const carouselImages = [
     { type: 'flyer', image: flyer, name: 'Flyer oficial do evento' },
     { type: 'flyer', image: '/lovable-uploads/de50cc19-19d3-44a1-bf48-7a14dcc3a803.png', name: 'Element\'s Fest Projeto X' },
@@ -37,17 +37,24 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
 
   // Preload images to avoid black screen
   useEffect(() => {
-    const preloadImages = () => {
-      const loadedStates = [...imagesLoaded];
-      
-      carouselImages.forEach((item, index) => {
-        const img = new Image();
-        img.src = item.image;
-        img.onload = () => {
-          loadedStates[index] = true;
-          setImagesLoaded([...loadedStates]);
-        };
+    const preloadImages = async () => {
+      const promises = carouselImages.map((item) => {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.src = item.image;
+          img.onload = resolve;
+          img.onerror = reject;
+        });
       });
+
+      try {
+        await Promise.all(promises);
+        setImagesLoaded(true);
+      } catch (error) {
+        console.error("Error loading images:", error);
+        // Still set loaded to true to avoid infinite loading
+        setImagesLoaded(true);
+      }
     };
     
     preloadImages();
@@ -55,6 +62,8 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
   
   // Auto rotate carousel every 5 seconds
   useEffect(() => {
+    if (!imagesLoaded) return;
+
     const startAutoRotation = () => {
       intervalRef.current = setInterval(() => {
         setCurrentIndex(prevIndex => (prevIndex + 1) % carouselImages.length);
@@ -69,7 +78,7 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
         clearInterval(intervalRef.current);
       }
     };
-  }, [carouselImages.length]);
+  }, [carouselImages.length, imagesLoaded]);
   
   // Reset timer when manually changing slide
   const handleSlideChange = (index: number) => {
@@ -103,6 +112,14 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
       }
     }
   };
+
+  if (!imagesLoaded) {
+    return (
+      <div className="relative w-full h-[70vh] bg-dark flex items-center justify-center">
+        <div className="text-white text-xl">Carregando imagens...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative w-full h-[70vh] overflow-hidden rounded-lg">
