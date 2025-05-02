@@ -1,24 +1,49 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { motion } from 'framer-motion';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import AdminDashboard from '@/components/admin/AdminDashboard';
+import AdminEvents from '@/components/admin/AdminEvents';
+import AdminTickets from '@/components/admin/AdminTickets';
+import AdminUsers from '@/components/admin/AdminUsers';
+import AdminVerification from '@/components/admin/AdminVerification';
+import AdminSettings from '@/components/admin/AdminSettings';
+import { QrCode, Users, Calendar, Ticket, Settings, BarChart } from 'lucide-react';
 
 const Admin: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [scanResult, setScanResult] = useState<null | { valid: boolean; message: string }>(null);
-  const [qrCode, setQrCode] = useState('');
+  const [activeTab, setActiveTab] = useState('dashboard');
+  
+  // Check if user is logged in and is an admin
+  useEffect(() => {
+    const currentUser = localStorage.getItem('currentUser') 
+      ? JSON.parse(localStorage.getItem('currentUser') || '{}') 
+      : null;
+    
+    if (currentUser && currentUser.role === 'admin') {
+      setIsLoggedIn(true);
+    }
+  }, []);
   
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     
     // Implementação simples - em um sistema real deveria usar autenticação segura
     if (username === 'admin' && password === 'projetox2025') {
+      const adminUser = {
+        email: 'admin@aleatoriosfest.com',
+        name: 'Administrador',
+        role: 'admin'
+      };
+      
+      localStorage.setItem('currentUser', JSON.stringify(adminUser));
       setIsLoggedIn(true);
       toast.success('Login realizado com sucesso!');
     } else {
@@ -26,25 +51,19 @@ const Admin: React.FC = () => {
     }
   };
   
-  const handleScanQR = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!qrCode.trim()) {
-      toast.error('Por favor, insira um código QR válido');
-      return;
-    }
-    
-    // Simulação de validação - em um sistema real verificaria com o backend
-    if (qrCode === 'VALID123') {
-      setScanResult({ valid: true, message: 'Ingresso válido! Acesso permitido.' });
-      toast.success('Ingresso válido!');
-    } else {
-      setScanResult({ valid: false, message: 'Ingresso inválido ou já utilizado!' });
-      toast.error('Ingresso inválido!');
-    }
-    
-    setQrCode('');
+  const handleChangeTab = (tab: string) => {
+    setActiveTab(tab);
   };
+  
+  // Navigation items for admin panel
+  const navItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: BarChart },
+    { id: 'events', label: 'Eventos', icon: Calendar },
+    { id: 'tickets', label: 'Ingressos', icon: Ticket },
+    { id: 'users', label: 'Usuários', icon: Users },
+    { id: 'verification', label: 'Verificação', icon: QrCode },
+    { id: 'settings', label: 'Configurações', icon: Settings }
+  ];
   
   return (
     <div className="min-h-screen bg-dark">
@@ -98,70 +117,52 @@ const Admin: React.FC = () => {
             </div>
           </div>
         ) : (
-          <div className="max-w-xl mx-auto">
-            <div className="glass p-6 rounded-lg mb-8">
-              <h2 className="text-2xl font-bold text-white mb-4">Validação de Ingressos</h2>
-              
-              <form onSubmit={handleScanQR} className="space-y-4">
-                <div>
-                  <label className="block text-white mb-2">Código QR</label>
-                  <Input 
-                    value={qrCode}
-                    onChange={(e) => setQrCode(e.target.value)}
-                    className="bg-dark-gray border-light-gray text-white"
-                    placeholder="Digite o código QR ou use o scanner"
-                  />
-                </div>
+          <div className="max-w-7xl mx-auto">
+            {/* Admin Dashboard UI with Sidebar Navigation */}
+            <div className="flex flex-col lg:flex-row gap-6">
+              {/* Sidebar Navigation */}
+              <div className="lg:w-64 glass rounded-lg p-4">
+                <nav className="space-y-2">
+                  {navItems.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => handleChangeTab(item.id)}
+                      className={`flex items-center gap-3 w-full p-3 rounded-lg transition-colors ${
+                        activeTab === item.id
+                          ? "bg-neon-purple/20 text-neon-purple"
+                          : "text-white hover:bg-light-gray/10"
+                      }`}
+                    >
+                      <item.icon size={20} />
+                      <span>{item.label}</span>
+                    </button>
+                  ))}
+                </nav>
                 
-                <div className="flex gap-4">
+                <div className="mt-8 pt-4 border-t border-light-gray/30">
                   <Button 
-                    type="submit"
-                    className="flex-1 bg-neon-blue hover:bg-neon-blue/80 text-black font-bold"
-                  >
-                    Verificar Código
-                  </Button>
-                  
-                  <Button 
-                    type="button"
                     variant="outline"
-                    className="flex-1 border-neon-blue text-neon-blue hover:bg-neon-blue hover:text-black"
+                    className="w-full text-gray-400 hover:text-white border-light-gray/30"
                     onClick={() => {
-                      // Em uma aplicação real, aqui integraria com a câmera para leitura de QR
-                      toast.info('Funcionalidade de scanner em desenvolvimento');
+                      localStorage.removeItem('currentUser');
+                      setIsLoggedIn(false);
+                      toast.info('Logout realizado com sucesso');
                     }}
                   >
-                    Usar Scanner
+                    Sair
                   </Button>
                 </div>
-              </form>
-            </div>
-            
-            {scanResult && (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className={`p-6 rounded-lg text-center ${scanResult.valid ? 'bg-green-900' : 'bg-red-900'}`}
-              >
-                <h3 className="text-xl font-bold text-white mb-2">
-                  {scanResult.valid ? 'Acesso Permitido' : 'Acesso Negado'}
-                </h3>
-                <p className="text-white">{scanResult.message}</p>
-              </motion.div>
-            )}
-            
-            <div className="mt-8 text-center">
-              <Button 
-                variant="ghost"
-                className="text-gray-400 hover:text-white"
-                onClick={() => {
-                  setIsLoggedIn(false);
-                  setUsername('');
-                  setPassword('');
-                  setScanResult(null);
-                }}
-              >
-                Sair
-              </Button>
+              </div>
+              
+              {/* Content Area */}
+              <div className="flex-1 glass rounded-lg p-6">
+                {activeTab === 'dashboard' && <AdminDashboard />}
+                {activeTab === 'events' && <AdminEvents />}
+                {activeTab === 'tickets' && <AdminTickets />}
+                {activeTab === 'users' && <AdminUsers />}
+                {activeTab === 'verification' && <AdminVerification />}
+                {activeTab === 'settings' && <AdminSettings />}
+              </div>
             </div>
           </div>
         )}
