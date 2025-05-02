@@ -8,14 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
-import { UserRound, Settings, Ticket, LogOut } from "lucide-react";
 
 const Navbar: React.FC = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -116,29 +108,6 @@ const Navbar: React.FC = () => {
     ? JSON.parse(localStorage.getItem('currentUser') || '{}') 
     : null;
 
-  // Handle profile navigation
-  const handleProfileNavigation = (path: string) => {
-    // For admin users, redirect to admin panel
-    if (path === 'profile' && currentUser?.role === 'admin') {
-      window.location.href = '/admin';
-      return;
-    }
-    
-    // For regular users paths
-    const pathMap: Record<string, string> = {
-      'profile': '/',
-      'tickets': '/meus-ingressos',
-      'settings': '/',
-      'logout': '/'
-    };
-    
-    if (path === 'logout') {
-      handleLogout();
-    }
-    
-    window.location.href = pathMap[path];
-  };
-
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-dark/80 backdrop-blur-md border-b border-light-gray">
       <div className="container mx-auto px-4 py-3">
@@ -166,54 +135,14 @@ const Navbar: React.FC = () => {
             {currentUser ? (
               <>
                 <span className="hidden md:inline text-white">Olá, {currentUser.name}</span>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Avatar 
-                      className="h-8 w-8 ring-2 ring-neon-blue/50 cursor-pointer hover:ring-neon-blue transition-all"
-                    >
-                      <AvatarImage src="" />
-                      <AvatarFallback className="bg-light-gray text-neon-blue">
-                        <UserRound className="w-4 h-4" />
-                      </AvatarFallback>
-                    </Avatar>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 bg-dark-gray border border-light-gray/30 text-white">
-                    <div className="px-2 py-1.5 text-sm">
-                      <p className="truncate font-medium text-neon-blue">{currentUser.name}</p>
-                      <p className="truncate text-xs text-gray-400">{currentUser.email}</p>
-                    </div>
-                    <DropdownMenuSeparator className="bg-light-gray/20" />
-                    <DropdownMenuItem 
-                      className="cursor-pointer flex items-center gap-2 text-white hover:bg-light-gray/10 hover:text-neon-blue"
-                      onClick={() => handleProfileNavigation('profile')}
-                    >
-                      <UserRound className="w-4 h-4" />
-                      <span>Meu Perfil</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      className="cursor-pointer flex items-center gap-2 text-white hover:bg-light-gray/10 hover:text-neon-blue"
-                      onClick={() => handleProfileNavigation('tickets')}
-                    >
-                      <Ticket className="w-4 h-4" />
-                      <span>Meus Ingressos</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      className="cursor-pointer flex items-center gap-2 text-white hover:bg-light-gray/10 hover:text-neon-blue"
-                      onClick={() => handleProfileNavigation('settings')}
-                    >
-                      <Settings className="w-4 h-4" />
-                      <span>Configurações</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator className="bg-light-gray/20" />
-                    <DropdownMenuItem 
-                      className="cursor-pointer flex items-center gap-2 text-white hover:bg-light-gray/10 hover:text-red-500"
-                      onClick={() => handleProfileNavigation('logout')}
-                    >
-                      <LogOut className="w-4 h-4" />
-                      <span>Sair</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="hidden md:flex border-neon-blue text-neon-blue hover:bg-neon-blue hover:text-black"
+                  onClick={handleLogout}
+                >
+                  Sair
+                </Button>
               </>
             ) : (
               <Button 
@@ -226,6 +155,18 @@ const Navbar: React.FC = () => {
                 Entrar
               </Button>
             )}
+            
+            <Avatar 
+              className="h-8 w-8 ring-2 ring-neon-blue/50 cursor-pointer hover:ring-neon-blue transition-all"
+              onClick={() => setShowAuthModal(true)}
+            >
+              <AvatarImage src="" />
+              <AvatarFallback className="bg-light-gray text-neon-blue">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+              </AvatarFallback>
+            </Avatar>
           </div>
         </div>
       </div>
