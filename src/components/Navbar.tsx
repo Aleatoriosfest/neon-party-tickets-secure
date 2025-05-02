@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -8,6 +8,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useAuth } from '@/contexts/AuthContext';
+import { Shield, Ticket, User, Settings, LogOut } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -16,49 +25,28 @@ const Navbar: React.FC = () => {
   const [name, setName] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const { user, signIn, signUp, signOut, isAdmin } = useAuth();
+  const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
     
-    // Simulate login process
-    setTimeout(() => {
-      // For demo purposes, hardcoding two test accounts
-      if (
-        (email === 'admin@aleatoriosfest.com' && password === 'Admin123!') || 
-        (email === 'customer@aleatoriosfest.com' && password === 'Customer123!')
-      ) {
-        const user = {
-          email,
-          role: email.includes('admin') ? 'admin' : 'customer',
-          name: email.includes('admin') ? 'Administrador' : 'Cliente'
-        };
-        
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        toast.success(`Login realizado com sucesso! Bem-vindo(a), ${user.name}!`);
-        setShowAuthModal(false);
-        
-        // If there's a redirect URL stored, navigate to it
-        const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
-        if (redirectUrl) {
-          sessionStorage.removeItem('redirectAfterLogin');
-          // Allow time for toast to show before redirect
-          setTimeout(() => {
-            window.location.href = redirectUrl;
-          }, 1000);
-        }
-      } else {
-        toast.error('Credenciais inválidas. Tente novamente.');
-      }
+    try {
+      await signIn(email, password);
+      setShowAuthModal(false);
+    } catch (error) {
+      console.error('Login error:', error);
+    } finally {
       setIsProcessing(false);
-    }, 1000);
+    }
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
     
-    // Validações do formulário
+    // Form validation
     if (password !== confirmPassword) {
       toast.error('As senhas não coincidem. Tente novamente.');
       setIsProcessing(false);
@@ -71,42 +59,15 @@ const Navbar: React.FC = () => {
       return;
     }
     
-    // Simulate registration process
-    setTimeout(() => {
-      // Create a new user (in a real app, this would be sent to a backend)
-      const user = {
-        email,
-        name,
-        role: 'customer'
-      };
-      
-      localStorage.setItem('currentUser', JSON.stringify(user));
-      toast.success(`Cadastro realizado com sucesso! Bem-vindo(a), ${name}!`);
+    try {
+      await signUp(email, password, name, 'user');
       setShowAuthModal(false);
-      
-      // If there's a redirect URL stored, navigate to it
-      const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
-      if (redirectUrl) {
-        sessionStorage.removeItem('redirectAfterLogin');
-        // Allow time for toast to show before redirect
-        setTimeout(() => {
-          window.location.href = redirectUrl;
-        }, 1000);
-      }
-      
+    } catch (error) {
+      console.error('Registration error:', error);
+    } finally {
       setIsProcessing(false);
-    }, 1500);
+    }
   };
-
-  const handleLogout = () => {
-    localStorage.removeItem('currentUser');
-    toast.info('Logout realizado com sucesso!');
-  };
-
-  // Check if user is logged in
-  const currentUser = localStorage.getItem('currentUser') 
-    ? JSON.parse(localStorage.getItem('currentUser') || '{}') 
-    : null;
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-dark/80 backdrop-blur-md border-b border-light-gray">
@@ -123,26 +84,93 @@ const Navbar: React.FC = () => {
             <Link to="/eventos" className="text-white hover:text-neon-blue transition-colors">
               Eventos
             </Link>
-            <Link to="/meus-ingressos" className="text-white hover:text-neon-blue transition-colors">
-              Meus Ingressos
-            </Link>
+            {user && (
+              <Link to="/meus-ingressos" className="text-white hover:text-neon-blue transition-colors">
+                Meus Ingressos
+              </Link>
+            )}
             <Link to="/sobre" className="text-white hover:text-neon-blue transition-colors">
               Sobre
             </Link>
           </nav>
           
           <div className="flex items-center space-x-4">
-            {currentUser ? (
+            {user ? (
               <>
-                <span className="hidden md:inline text-white">Olá, {currentUser.name}</span>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="hidden md:flex border-neon-blue text-neon-blue hover:bg-neon-blue hover:text-black"
-                  onClick={handleLogout}
-                >
-                  Sair
-                </Button>
+                <span className="hidden md:inline text-white">Olá, {user.name}</span>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Avatar 
+                      className="h-8 w-8 ring-2 ring-neon-blue/50 cursor-pointer hover:ring-neon-blue transition-all"
+                    >
+                      <AvatarImage src="" />
+                      <AvatarFallback className="bg-light-gray text-neon-blue">
+                        {user.name.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56 bg-dark-gray border-light-gray text-white">
+                    <div className="flex items-center justify-start gap-2 p-2">
+                      <div className="rounded-full h-8 w-8 bg-neon-purple/20 flex items-center justify-center">
+                        <User className="h-4 w-4 text-neon-purple" />
+                      </div>
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium">{user.name}</p>
+                        <p className="text-xs text-gray-400">{user.email}</p>
+                      </div>
+                    </div>
+                    <DropdownMenuSeparator className="bg-gray-700" />
+                    
+                    {/* Admin specific menu items */}
+                    {isAdmin && (
+                      <>
+                        <DropdownMenuItem 
+                          className="cursor-pointer hover:bg-gray-800"
+                          onClick={() => navigate('/admin')}
+                        >
+                          <Shield className="mr-2 h-4 w-4" />
+                          <span>Painel de Controle</span>
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                    
+                    {/* Regular user menu items */}
+                    {!isAdmin && (
+                      <>
+                        <DropdownMenuItem 
+                          className="cursor-pointer hover:bg-gray-800"
+                          onClick={() => navigate('/meus-ingressos')}
+                        >
+                          <Ticket className="mr-2 h-4 w-4" />
+                          <span>Meus Ingressos</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          className="cursor-pointer hover:bg-gray-800"
+                          onClick={() => navigate('/minha-conta')}
+                        >
+                          <User className="mr-2 h-4 w-4" />
+                          <span>Editar Perfil</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          className="cursor-pointer hover:bg-gray-800"
+                          onClick={() => navigate('/minha-conta')}
+                        >
+                          <Settings className="mr-2 h-4 w-4" />
+                          <span>Trocar Senha</span>
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                    
+                    <DropdownMenuSeparator className="bg-gray-700" />
+                    <DropdownMenuItem 
+                      className="cursor-pointer hover:bg-gray-800 text-red-400"
+                      onClick={() => signOut()}
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Sair</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </>
             ) : (
               <Button 
@@ -156,17 +184,19 @@ const Navbar: React.FC = () => {
               </Button>
             )}
             
-            <Avatar 
-              className="h-8 w-8 ring-2 ring-neon-blue/50 cursor-pointer hover:ring-neon-blue transition-all"
-              onClick={() => setShowAuthModal(true)}
-            >
-              <AvatarImage src="" />
-              <AvatarFallback className="bg-light-gray text-neon-blue">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                </svg>
-              </AvatarFallback>
-            </Avatar>
+            {!user && (
+              <Avatar 
+                className="h-8 w-8 ring-2 ring-neon-blue/50 cursor-pointer hover:ring-neon-blue transition-all"
+                onClick={() => setShowAuthModal(true)}
+              >
+                <AvatarImage src="" />
+                <AvatarFallback className="bg-light-gray text-neon-blue">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                  </svg>
+                </AvatarFallback>
+              </Avatar>
+            )}
           </div>
         </div>
       </div>

@@ -6,9 +6,13 @@ import { MotionConfig } from "framer-motion";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
+import { AuthProvider } from "@/contexts/AuthContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import MyTickets from "./pages/MyTickets";
 import Admin from "./pages/Admin";
+import UserAccount from "./pages/UserAccount";
+import AccessDenied from "./pages/AccessDenied";
 import NotFound from "./pages/NotFound";
 
 // Create a new QueryClient instance
@@ -19,25 +23,41 @@ const App = () => {
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
-          <TooltipProvider>
-            <MotionConfig reducedMotion="user">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/meus-ingressos" element={<MyTickets />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/payment-success" element={<Index />} />
-                <Route path="/payment-canceled" element={<Index />} />
-                <Route path="/politica-privacidade" element={<Index />} />
-                <Route path="/termos-uso" element={<Index />} />
-                <Route path="/eventos" element={<Index />} />
-                <Route path="/sobre" element={<Index />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-              <Toaster />
-              <Sonner />
-            </MotionConfig>
-          </TooltipProvider>
+          <AuthProvider>
+            <TooltipProvider>
+              <MotionConfig reducedMotion="user">
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/meus-ingressos" element={
+                    <ProtectedRoute>
+                      <MyTickets />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/minha-conta" element={
+                    <ProtectedRoute>
+                      <UserAccount />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/admin" element={
+                    <ProtectedRoute requireAdmin>
+                      <Admin />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/access-denied" element={<AccessDenied />} />
+                  <Route path="/payment-success" element={<Index />} />
+                  <Route path="/payment-canceled" element={<Index />} />
+                  <Route path="/politica-privacidade" element={<Index />} />
+                  <Route path="/termos-uso" element={<Index />} />
+                  <Route path="/eventos" element={<Index />} />
+                  <Route path="/sobre" element={<Index />} />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+                <Toaster />
+                <Sonner />
+              </MotionConfig>
+            </TooltipProvider>
+          </AuthProvider>
         </BrowserRouter>
       </QueryClientProvider>
     </React.StrictMode>
