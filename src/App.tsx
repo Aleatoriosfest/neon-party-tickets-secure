@@ -1,6 +1,6 @@
 
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MotionConfig } from "framer-motion";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +14,19 @@ import NotFound from "./pages/NotFound";
 // Create a new QueryClient instance
 const queryClient = new QueryClient();
 
+// Auth guard component
+const AuthGuard = ({ children }: { children: React.ReactNode }) => {
+  const isLoggedIn = localStorage.getItem('currentUser') !== null;
+  
+  if (!isLoggedIn) {
+    // Store the current path for redirection after login
+    sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
+    return <Navigate to="/" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
 const App = () => {
   return (
     <React.StrictMode>
@@ -23,7 +36,14 @@ const App = () => {
             <MotionConfig reducedMotion="user">
               <Routes>
                 <Route path="/" element={<Index />} />
-                <Route path="/meus-ingressos" element={<MyTickets />} />
+                <Route 
+                  path="/meus-ingressos" 
+                  element={
+                    <AuthGuard>
+                      <MyTickets />
+                    </AuthGuard>
+                  } 
+                />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/payment-success" element={<Index />} />
                 <Route path="/payment-canceled" element={<Index />} />

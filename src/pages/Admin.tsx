@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { motion } from 'framer-motion';
@@ -17,20 +18,33 @@ import { QrCode, Users, Calendar, Ticket, Settings, BarChart } from 'lucide-reac
 
 const Admin: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [activeTab, setActiveTab] = useState('dashboard');
+  const navigate = useNavigate();
   
   // Check if user is logged in and is an admin
   useEffect(() => {
-    const currentUser = localStorage.getItem('currentUser') 
-      ? JSON.parse(localStorage.getItem('currentUser') || '{}') 
-      : null;
+    const checkUserAuth = () => {
+      const currentUser = localStorage.getItem('currentUser') 
+        ? JSON.parse(localStorage.getItem('currentUser') || '{}') 
+        : null;
+      
+      if (currentUser) {
+        setIsLoggedIn(true);
+        if (currentUser.role === 'admin') {
+          setIsAdmin(true);
+        } else {
+          // Redirect non-admin users
+          toast.error('Acesso restrito! Área exclusiva para administradores.');
+          navigate('/');
+        }
+      }
+    };
     
-    if (currentUser && currentUser.role === 'admin') {
-      setIsLoggedIn(true);
-    }
-  }, []);
+    checkUserAuth();
+  }, [navigate]);
   
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,6 +59,7 @@ const Admin: React.FC = () => {
       
       localStorage.setItem('currentUser', JSON.stringify(adminUser));
       setIsLoggedIn(true);
+      setIsAdmin(true);
       toast.success('Login realizado com sucesso!');
     } else {
       toast.error('Usuário ou senha inválidos');
@@ -78,7 +93,7 @@ const Admin: React.FC = () => {
           Área do <span className="neon-text">Administrador</span>
         </motion.h1>
         
-        {!isLoggedIn ? (
+        {!isLoggedIn || !isAdmin ? (
           <div className="max-w-md mx-auto">
             <div className="glass p-6 rounded-lg">
               <motion.form 
@@ -146,7 +161,9 @@ const Admin: React.FC = () => {
                     onClick={() => {
                       localStorage.removeItem('currentUser');
                       setIsLoggedIn(false);
+                      setIsAdmin(false);
                       toast.info('Logout realizado com sucesso');
+                      navigate('/');
                     }}
                   >
                     Sair
