@@ -47,6 +47,94 @@
   color: #888;
 }
 
+/* Neon Effects */
+.neon-text {
+  color: #fff;
+  text-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 15px #0ff, 0 0 20px #0ff;
+}
+
+.neon-text-purple {
+  color: #fff;
+  text-shadow: 0 0 5px #D946EF, 0 0 10px #D946EF, 0 0 15px #D946EF, 0 0 20px #D946EF;
+}
+
+.neon-text-green {
+  color: #fff;
+  text-shadow: 0 0 5px #4ADE80, 0 0 10px #4ADE80, 0 0 15px #4ADE80, 0 0 20px #4ADE80;
+}
+
+.neon-blue-border {
+  box-shadow: 0 0 5px #0ff, 0 0 10px #0ff;
+}
+
+.neon-purple-border {
+  box-shadow: 0 0 5px #D946EF, 0 0 10px #D946EF;
+}
+
+.neon-green-border {
+  box-shadow: 0 0 5px #4ADE80, 0 0 10px #4ADE80;
+}
+
+.glass {
+  background: rgba(31, 41, 55, 0.25);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* Button Neon Effects */
+.btn-neon-blue {
+  position: relative;
+  background-color: transparent;
+  color: #33C3F0;
+  border: 2px solid #33C3F0;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.btn-neon-blue:hover {
+  background-color: #33C3F0;
+  color: #000;
+  box-shadow: 0 0 10px #33C3F0, 0 0 20px #33C3F0;
+}
+
+.btn-neon-purple {
+  position: relative;
+  background-color: transparent;
+  color: #D946EF;
+  border: 2px solid #D946EF;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.btn-neon-purple:hover {
+  background-color: #D946EF;
+  color: #000;
+  box-shadow: 0 0 10px #D946EF, 0 0 20px #D946EF;
+}
+
+/* Improved Card Styles */
+.card-neon {
+  background: rgba(20, 20, 20, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.card-neon:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 15px rgba(33, 203, 240, 0.3);
+}
+
 /* Responsive styles */
 .container-responsive {
   width: 100%;
@@ -108,4 +196,44 @@ a,
 /* Improved transitions */
 .smooth-transition {
   transition: all 0.3s ease-in-out;
+}
+
+/* Improved Carousel */
+.embla__slide {
+  position: relative;
+  flex: 0 0 100%;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.embla__slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.embla__slide:hover img {
+  transform: scale(1.05);
+}
+
+.embla__dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.embla__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.embla__dot--selected {
+  background-color: #33C3F0;
+  transform: scale(1.2);
+  box-shadow: 0 0 5px #33C3F0;
 }

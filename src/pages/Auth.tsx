@@ -26,9 +26,9 @@ const Auth: React.FC = () => {
   useEffect(() => {
     if (user) {
       if (user.role === 'admin') {
-        navigate('/admin');
+        navigate('/admin/dashboard');
       } else {
-        navigate('/meus-ingressos');
+        navigate('/minha-conta');
       }
     }
   }, [user, navigate]);
@@ -85,9 +85,9 @@ const Auth: React.FC = () => {
           transition={{ duration: 0.5 }}
           className="w-full max-w-md"
         >
-          <Card className="bg-dark-gray border-light-gray">
+          <Card className="bg-dark-gray border-light-gray shadow-lg neon-blue-border">
             <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl font-bold text-white">
+              <CardTitle className="text-2xl font-bold text-white neon-text">
                 {activeTab === 'login' ? 'Entrar' : 'Criar Conta'}
               </CardTitle>
               <CardDescription className="text-gray-400">
@@ -132,7 +132,7 @@ const Auth: React.FC = () => {
                     <div className="bg-gray-900 p-3 rounded-md text-sm">
                       <p className="text-gray-400 mb-1">Contas de teste disponíveis:</p>
                       <p className="text-neon-blue">Admin: admin@aleatoriosfest.com / Admin123!</p>
-                      <p className="text-neon-purple">Cliente: customer@aleatoriosfest.com / Customer123!</p>
+                      <p className="neon-text-purple">Cliente: customer@aleatoriosfest.com / Customer123!</p>
                     </div>
 
                     <Button 

@@ -3,8 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +11,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from '@/contexts/AuthContext';
-import { Shield, Ticket, User, Settings, LogOut, CalendarPlus, BarChart, Menu, Home, X } from 'lucide-react';
+import { 
+  Shield, 
+  Ticket, 
+  User, 
+  Settings, 
+  LogOut, 
+  CalendarPlus, 
+  BarChart, 
+  Menu, 
+  Home, 
+  X, 
+  Mail,
+  Key
+} from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -73,7 +84,7 @@ const Navbar: React.FC = () => {
               <Link to="/eventos" className="text-white hover:text-neon-blue transition-colors py-2">
                 Eventos
               </Link>
-              {user && (
+              {user && !isAdmin && (
                 <Link to="/meus-ingressos" className="text-white hover:text-neon-blue transition-colors py-2">
                   Meus Ingressos
                 </Link>
@@ -118,21 +129,28 @@ const Navbar: React.FC = () => {
                             onClick={() => handleNavigate('/admin/dashboard')}
                           >
                             <Shield className="mr-2 h-4 w-4" />
-                            <span>Painel de Controle</span>
+                            <span>Painel administrativo</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem 
                             className="cursor-pointer hover:bg-gray-800 h-10"
                             onClick={() => handleNavigate('/admin')}
                           >
                             <CalendarPlus className="mr-2 h-4 w-4" />
-                            <span>Gerenciar Eventos</span>
+                            <span>Gerenciar eventos</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem 
                             className="cursor-pointer hover:bg-gray-800 h-10"
                             onClick={() => handleNavigate('/admin')}
                           >
                             <BarChart className="mr-2 h-4 w-4" />
-                            <span>Ver Ingressos Vendidos</span>
+                            <span>Ver ingressos vendidos</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            className="cursor-pointer hover:bg-gray-800 h-10"
+                            onClick={() => handleNavigate('/admin')}
+                          >
+                            <Settings className="mr-2 h-4 w-4" />
+                            <span>Configurações</span>
                           </DropdownMenuItem>
                         </>
                       )}
@@ -145,21 +163,28 @@ const Navbar: React.FC = () => {
                             onClick={() => handleNavigate('/meus-ingressos')}
                           >
                             <Ticket className="mr-2 h-4 w-4" />
-                            <span>Meus Ingressos</span>
+                            <span>Meus ingressos</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem 
                             className="cursor-pointer hover:bg-gray-800 h-10"
                             onClick={() => handleNavigate('/minha-conta')}
                           >
                             <User className="mr-2 h-4 w-4" />
-                            <span>Editar Perfil</span>
+                            <span>Minha conta</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem 
                             className="cursor-pointer hover:bg-gray-800 h-10"
-                            onClick={() => handleNavigate('/minha-conta')}
+                            onClick={() => handleNavigate('/minha-conta/email')}
                           >
-                            <Settings className="mr-2 h-4 w-4" />
-                            <span>Trocar Senha</span>
+                            <Mail className="mr-2 h-4 w-4" />
+                            <span>Trocar e-mail</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            className="cursor-pointer hover:bg-gray-800 h-10"
+                            onClick={() => handleNavigate('/minha-conta/senha')}
+                          >
+                            <Key className="mr-2 h-4 w-4" />
+                            <span>Trocar senha</span>
                           </DropdownMenuItem>
                         </>
                       )}
@@ -230,7 +255,7 @@ const Navbar: React.FC = () => {
                 <CalendarPlus className="mr-3 h-5 w-5" />
                 Eventos
               </Link>
-              {user && (
+              {user && !isAdmin && (
                 <Link 
                   to="/meus-ingressos" 
                   className="flex items-center px-4 py-3 text-white hover:bg-light-gray/10 rounded-md"
@@ -238,6 +263,16 @@ const Navbar: React.FC = () => {
                 >
                   <Ticket className="mr-3 h-5 w-5" />
                   Meus Ingressos
+                </Link>
+              )}
+              {isAdmin && (
+                <Link 
+                  to="/admin/dashboard" 
+                  className="flex items-center px-4 py-3 text-white hover:bg-light-gray/10 rounded-md"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Shield className="mr-3 h-5 w-5" />
+                  Painel Admin
                 </Link>
               )}
               <Link 
@@ -258,6 +293,16 @@ const Navbar: React.FC = () => {
                     Login / Cadastro
                   </Button>
                 </div>
+              )}
+              
+              {user && (
+                <Button 
+                  onClick={() => signOut()}
+                  variant="destructive"
+                  className="mt-2"
+                >
+                  <LogOut className="mr-2 h-4 w-4" /> Sair
+                </Button>
               )}
             </nav>
           </motion.div>

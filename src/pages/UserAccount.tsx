@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -14,7 +13,8 @@ import { z } from 'zod';
 import { toast } from '@/components/ui/sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { UserRound, KeyRound, Ticket } from 'lucide-react';
+import { UserRound, KeyRound, Ticket, Mail } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const profileSchema = z.object({
   name: z.string().min(2, { message: 'Nome deve ter pelo menos 2 caracteres' }),
@@ -30,9 +30,15 @@ const passwordSchema = z.object({
   path: ["confirmPassword"],
 });
 
+const emailSchema = z.object({
+  newEmail: z.string().email({ message: 'Email inválido' }),
+  password: z.string().min(6, { message: 'Senha deve ter pelo menos 6 caracteres' }),
+});
+
 const UserAccount: React.FC = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("profile");
+  const navigate = useNavigate();
   
   const profileForm = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
@@ -48,6 +54,14 @@ const UserAccount: React.FC = () => {
       currentPassword: '',
       newPassword: '',
       confirmPassword: '',
+    },
+  });
+  
+  const emailForm = useForm<z.infer<typeof emailSchema>>({
+    resolver: zodResolver(emailSchema),
+    defaultValues: {
+      newEmail: '',
+      password: '',
     },
   });
   
@@ -93,6 +107,21 @@ const UserAccount: React.FC = () => {
     }
   };
 
+  const onEmailSubmit = async (values: z.infer<typeof emailSchema>) => {
+    try {
+      const { error } = await supabase.auth.updateUser({ 
+        email: values.newEmail 
+      });
+
+      if (error) throw error;
+      
+      toast.success('Email atualizado com sucesso! Verifique sua caixa de entrada para confirmar.');
+      emailForm.reset();
+    } catch (error: any) {
+      toast.error(error.message || 'Erro ao atualizar email');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-dark">
       <Navbar />
@@ -129,26 +158,33 @@ const UserAccount: React.FC = () => {
                   <span>Perfil</span>
                 </button>
                 <button
+                  onClick={() => setActiveTab("email")}
+                  className={`flex items-center gap-3 w-full p-3 rounded-lg transition-colors ${
+                    activeTab === "email"
+                      ? "bg-neon-blue/20 text-neon-blue"
+                      : "text-white hover:bg-light-gray/10"
+                  }`}
+                >
+                  <Mail size={20} />
+                  <span>Trocar E-mail</span>
+                </button>
+                <button
                   onClick={() => setActiveTab("password")}
                   className={`flex items-center gap-3 w-full p-3 rounded-lg transition-colors ${
                     activeTab === "password"
-                      ? "bg-neon-purple/20 text-neon-purple"
+                      ? "bg-neon-green/20 text-green-400"
                       : "text-white hover:bg-light-gray/10"
                   }`}
                 >
                   <KeyRound size={20} />
-                  <span>Senha</span>
+                  <span>Trocar Senha</span>
                 </button>
                 <button
-                  onClick={() => setActiveTab("tickets")}
-                  className={`flex items-center gap-3 w-full p-3 rounded-lg transition-colors ${
-                    activeTab === "tickets"
-                      ? "bg-neon-purple/20 text-neon-purple"
-                      : "text-white hover:bg-light-gray/10"
-                  }`}
+                  onClick={() => navigate('/meus-ingressos')}
+                  className="flex items-center gap-3 w-full p-3 rounded-lg transition-colors text-white hover:bg-light-gray/10"
                 >
                   <Ticket size={20} />
-                  <span>Ingressos</span>
+                  <span>Meus Ingressos</span>
                 </button>
               </nav>
             </motion.div>
@@ -163,9 +199,12 @@ const UserAccount: React.FC = () => {
             >
               {/* Profile Tab */}
               {activeTab === "profile" && (
-                <Card className="bg-dark-gray text-white border-light-gray">
+                <Card className="bg-dark-gray text-white border-light-gray neon-purple-border">
                   <CardHeader>
-                    <CardTitle>Editar Perfil</CardTitle>
+                    <CardTitle className="flex items-center gap-2">
+                      <UserRound className="text-neon-purple" />
+                      Editar Perfil
+                    </CardTitle>
                     <CardDescription className="text-gray-400">
                       Atualize suas informações pessoais
                     </CardDescription>
@@ -183,7 +222,7 @@ const UserAccount: React.FC = () => {
                                 <Input 
                                   placeholder="Seu nome" 
                                   {...field} 
-                                  className="bg-gray-800 border-gray-700"
+                                  className="bg-gray-800 border-gray-700 focus:ring-neon-purple focus:border-neon-purple"
                                 />
                               </FormControl>
                               <FormMessage />
@@ -210,8 +249,70 @@ const UserAccount: React.FC = () => {
                           )}
                         />
                         
-                        <Button type="submit" className="bg-neon-purple hover:bg-neon-purple/80">
+                        <Button type="submit" className="bg-neon-purple hover:bg-neon-purple/80 w-full sm:w-auto">
                           Salvar Alterações
+                        </Button>
+                      </form>
+                    </Form>
+                  </CardContent>
+                </Card>
+              )}
+              
+              {/* Email Tab */}
+              {activeTab === "email" && (
+                <Card className="bg-dark-gray text-white border-light-gray neon-blue-border">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Mail className="text-neon-blue" />
+                      Alterar E-mail
+                    </CardTitle>
+                    <CardDescription className="text-gray-400">
+                      Atualize seu endereço de e-mail
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Form {...emailForm}>
+                      <form onSubmit={emailForm.handleSubmit(onEmailSubmit)} className="space-y-6">
+                        <FormField
+                          control={emailForm.control}
+                          name="newEmail"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Novo E-mail</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="email" 
+                                  placeholder="novo@email.com" 
+                                  {...field} 
+                                  className="bg-gray-800 border-gray-700 focus:ring-neon-blue focus:border-neon-blue"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={emailForm.control}
+                          name="password"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Senha Atual (para confirmar)</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="password" 
+                                  placeholder="••••••••" 
+                                  {...field} 
+                                  className="bg-gray-800 border-gray-700 focus:ring-neon-blue focus:border-neon-blue"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <Button type="submit" className="bg-neon-blue hover:bg-neon-blue/80 w-full sm:w-auto">
+                          Atualizar E-mail
                         </Button>
                       </form>
                     </Form>
@@ -221,9 +322,12 @@ const UserAccount: React.FC = () => {
               
               {/* Password Tab */}
               {activeTab === "password" && (
-                <Card className="bg-dark-gray text-white border-light-gray">
+                <Card className="bg-dark-gray text-white border-light-gray neon-green-border">
                   <CardHeader>
-                    <CardTitle>Alterar Senha</CardTitle>
+                    <CardTitle className="flex items-center gap-2">
+                      <KeyRound className="text-green-400" />
+                      Alterar Senha
+                    </CardTitle>
                     <CardDescription className="text-gray-400">
                       Atualize sua senha de acesso
                     </CardDescription>
@@ -288,35 +392,11 @@ const UserAccount: React.FC = () => {
                           )}
                         />
                         
-                        <Button type="submit" className="bg-neon-blue hover:bg-neon-blue/80">
+                        <Button type="submit" className="bg-green-500 hover:bg-green-600 w-full sm:w-auto">
                           Atualizar Senha
                         </Button>
                       </form>
                     </Form>
-                  </CardContent>
-                </Card>
-              )}
-              
-              {/* Tickets Tab */}
-              {activeTab === "tickets" && (
-                <Card className="bg-dark-gray text-white border-light-gray">
-                  <CardHeader>
-                    <CardTitle>Meus Ingressos</CardTitle>
-                    <CardDescription className="text-gray-400">
-                      Visualize todos os seus ingressos
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-center py-8 text-gray-400">
-                      Você será redirecionado para a página de ingressos
-                    </p>
-                    <div className="flex justify-center">
-                      <Button asChild className="bg-neon-purple hover:bg-neon-purple/80">
-                        <a href="/meus-ingressos">
-                          Ver meus ingressos
-                        </a>
-                      </Button>
-                    </div>
                   </CardContent>
                 </Card>
               )}

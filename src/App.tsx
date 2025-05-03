@@ -41,6 +41,16 @@ const App = () => {
                       <UserAccount />
                     </ProtectedRoute>
                   } />
+                  <Route path="/minha-conta/email" element={
+                    <ProtectedRoute>
+                      <UserAccount />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/minha-conta/senha" element={
+                    <ProtectedRoute>
+                      <UserAccount />
+                    </ProtectedRoute>
+                  } />
                   <Route path="/admin" element={
                     <ProtectedRoute requireAdmin>
                       <Admin />
