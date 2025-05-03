@@ -42,25 +42,50 @@
     @apply border-border;
   }
 
+  html {
+    @apply scroll-smooth;
+  }
+
   body {
     @apply bg-dark text-foreground bg-noise;
     font-feature-settings: "rlig" 1, "calt" 1;
+    overflow-x: hidden;
   }
   
-  /* Glassmorphism */
+  /* Improved typography for mobile */
+  h1 {
+    @apply text-2xl md:text-4xl lg:text-5xl font-bold;
+    letter-spacing: -0.025em;
+  }
+  
+  h2 {
+    @apply text-xl md:text-3xl lg:text-4xl font-bold;
+    letter-spacing: -0.025em;
+  }
+  
+  h3 {
+    @apply text-lg md:text-2xl lg:text-3xl font-bold;
+  }
+
+  p, li, a, button {
+    @apply text-sm md:text-base;
+  }
+  
+  /* Glassmorphism with better contrast */
   .glass {
-    @apply bg-black/30 backdrop-blur-xl border border-white/10;
+    @apply bg-black/40 backdrop-blur-xl border border-white/10 shadow-xl;
   }
   
-  /* Neon effects */
+  /* Enhanced Neon effects */
   .neon-text {
     @apply text-neon-blue;
     text-shadow: 0 0 5px theme('colors.neon-blue'), 
-                 0 0 15px theme('colors.neon-blue');
+                 0 0 15px theme('colors.neon-blue'),
+                 0 0 25px theme('colors.neon-blue/50');
   }
   
   .neon-border {
-    @apply border border-neon-blue/50;
+    @apply border border-neon-blue/50 shadow-lg;
     box-shadow: 0 0 5px theme('colors.neon-blue'),
                 inset 0 0 5px theme('colors.neon-blue');
   }
@@ -68,20 +93,53 @@
   .neon-purple-text {
     @apply text-neon-purple;
     text-shadow: 0 0 5px theme('colors.neon-purple'), 
-                 0 0 15px theme('colors.neon-purple');
+                 0 0 15px theme('colors.neon-purple'),
+                 0 0 25px theme('colors.neon-purple/50');
   }
   
   .neon-purple-border {
-    @apply border border-neon-purple/50;
+    @apply border border-neon-purple/50 shadow-lg;
     box-shadow: 0 0 5px theme('colors.neon-purple'),
                 inset 0 0 5px theme('colors.neon-purple');
   }
 
-  /* Card hover effects */
+  /* Improved Card hover effects */
   .event-card {
-    @apply transition-all duration-300;
+    @apply transition-all duration-300 shadow-lg hover:shadow-xl;
   }
   .event-card:hover {
     @apply transform -translate-y-1 scale-[1.02];
+  }
+  
+  /* Better touch-friendly components */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  /* Mobile navbar styles */
+  .mobile-nav {
+    @apply fixed bottom-0 left-0 right-0 bg-dark-gray/90 backdrop-blur-lg border-t border-light-gray z-50 flex justify-around py-2;
+  }
+  
+  /* Mobile menu animations */
+  .mobile-menu-enter {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  
+  .mobile-menu-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 300ms, transform 300ms;
+  }
+  
+  .mobile-menu-exit {
+    opacity: 1;
+  }
+  
+  .mobile-menu-exit-active {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 300ms, transform 300ms;
   }
 }

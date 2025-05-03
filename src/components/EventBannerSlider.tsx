@@ -2,6 +2,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from 'framer-motion';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { ChevronLeft, ChevronRight, Calendar, MapPin } from 'lucide-react';
 
 interface EventBannerSliderProps {
   title: string;
@@ -27,6 +29,7 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [imagesLoaded, setImagesLoaded] = useState(false);
+  const isMobile = useIsMobile();
   
   // Our carousel images - fixing the paths by removing "public/" prefix
   const carouselImages = [
@@ -93,6 +96,36 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
     }, 5000);
   };
 
+  const goToPrevSlide = () => {
+    setCurrentIndex((prevIndex) => 
+      prevIndex === 0 ? carouselImages.length - 1 : prevIndex - 1
+    );
+    
+    // Reset timer
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+    
+    intervalRef.current = setInterval(() => {
+      setCurrentIndex(prevIndex => (prevIndex + 1) % carouselImages.length);
+    }, 5000);
+  };
+
+  const goToNextSlide = () => {
+    setCurrentIndex((prevIndex) => 
+      (prevIndex + 1) % carouselImages.length
+    );
+    
+    // Reset timer
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+    
+    intervalRef.current = setInterval(() => {
+      setCurrentIndex(prevIndex => (prevIndex + 1) % carouselImages.length);
+    }, 5000);
+  };
+
   const handleComprarClick = () => {
     const element = document.getElementById('comprar');
     if (element) {
@@ -115,14 +148,17 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
 
   if (!imagesLoaded) {
     return (
-      <div className="relative w-full h-[70vh] bg-dark flex items-center justify-center">
-        <div className="text-white text-xl">Carregando imagens...</div>
+      <div className="relative w-full h-[50vh] md:h-[70vh] bg-dark flex items-center justify-center">
+        <div className="text-white text-xl flex flex-col items-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neon-blue mb-4"></div>
+          Carregando imagens...
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="relative w-full h-[70vh] overflow-hidden rounded-lg">
+    <div className="relative w-full h-[50vh] md:h-[70vh] overflow-hidden rounded-lg">
       {/* Carousel */}
       <div className="relative w-full h-full">
         <AnimatePresence initial={false}>
@@ -144,16 +180,33 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
           ))}
         </AnimatePresence>
         
+        {/* Navigation buttons */}
+        <button 
+          className="absolute top-1/2 left-2 z-10 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white rounded-full p-2 backdrop-blur-sm transition-colors"
+          onClick={goToPrevSlide}
+          aria-label="Previous slide"
+        >
+          <ChevronLeft size={isMobile ? 20 : 24} />
+        </button>
+        
+        <button 
+          className="absolute top-1/2 right-2 z-10 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white rounded-full p-2 backdrop-blur-sm transition-colors"
+          onClick={goToNextSlide}
+          aria-label="Next slide"
+        >
+          <ChevronRight size={isMobile ? 20 : 24} />
+        </button>
+        
         {/* Overlay gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-dark via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-dark via-dark/50 to-transparent" />
         
         {/* Carousel indicators */}
-        <div className="absolute bottom-28 left-0 right-0 flex justify-center gap-2 z-10">
+        <div className="absolute bottom-20 md:bottom-28 left-0 right-0 flex justify-center gap-2 z-10">
           {carouselImages.map((_, index) => (
             <button
               key={index}
               onClick={() => handleSlideChange(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
+              className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ${
                 index === currentIndex ? "bg-neon-blue scale-125" : "bg-white/50"
               }`}
               aria-label={`Go to slide ${index + 1}`}
@@ -166,33 +219,32 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="absolute bottom-0 left-0 w-full p-8 text-white"
+          className="absolute bottom-0 left-0 w-full p-4 md:p-8 text-white"
         >
           <div className="container mx-auto">
-            <h1 className="text-4xl md:text-6xl font-bold mb-2 neon-text">{title}</h1>
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-1 md:mb-2 neon-text">
+              {title}
+            </h1>
             {subtitle && (
-              <h2 className="text-2xl md:text-3xl font-bold mb-2 text-neon-purple">{subtitle}</h2>
+              <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-2 text-neon-purple">
+                {subtitle}
+              </h2>
             )}
-            <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
+            <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4 md:mb-6">
               <div className="flex items-center">
-                <svg className="w-5 h-5 mr-2 text-neon-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
-                <span className="text-xl">{date}</span>
-                {time && <span className="text-xl ml-2">• {time}</span>}
+                <Calendar className="w-4 h-4 md:w-5 md:h-5 mr-2 text-neon-blue" />
+                <span className="text-base md:text-xl">{date}</span>
+                {time && <span className="text-base md:text-xl ml-2">• {time}</span>}
               </div>
               <div className="flex items-center">
-                <svg className="w-5 h-5 mr-2 text-neon-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
-                <span className="text-xl">{location}</span>
+                <MapPin className="w-4 h-4 md:w-5 md:h-5 mr-2 text-neon-blue" />
+                <span className="text-base md:text-xl">{location}</span>
               </div>
             </div>
             <div className="flex justify-center w-full">
               <Button 
-                size="lg" 
-                className="bg-neon-blue hover:bg-neon-blue/80 text-black font-medium text-lg animate-pulse-neon"
+                size={isMobile ? "default" : "lg"} 
+                className="bg-neon-blue hover:bg-neon-blue/80 text-black font-medium text-base md:text-lg animate-pulse-neon neon-border w-full md:w-auto"
                 onClick={handleComprarClick}
               >
                 Comprar Ingresso
