@@ -1,58 +1,55 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Shield } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { ShieldAlert } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
 const AccessDenied: React.FC = () => {
+  const navigate = useNavigate();
+  
   return (
-    <div className="min-h-screen bg-dark">
+    <div className="min-h-screen bg-dark flex flex-col">
       <Navbar />
       
-      <div className="container mx-auto px-4 py-20">
-        <div className="max-w-lg mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="mb-8 flex justify-center"
-          >
-            <Shield className="w-24 h-24 text-red-500" />
-          </motion.div>
+      <div className="flex-1 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center"
+        >
+          <div className="mx-auto h-24 w-24 rounded-full bg-red-500/20 flex items-center justify-center mb-6">
+            <ShieldAlert size={48} className="text-red-500" />
+          </div>
           
-          <motion.h1 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-4xl font-bold text-white mb-4"
-          >
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Acesso Negado
-          </motion.h1>
+          </h1>
           
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="text-gray-300 mb-8"
-          >
-            Você não tem permissão para acessar esta página. Esta área é restrita a administradores.
-          </motion.p>
+          <p className="text-gray-400 max-w-md mx-auto mb-8">
+            Você não possui permissão para acessar esta página. Esta área é restrita a administradores do sistema.
+          </p>
           
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-          >
-            <Button asChild className="bg-neon-purple hover:bg-neon-purple/80">
-              <Link to="/">
-                Voltar para Home
-              </Link>
+          <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 justify-center">
+            <Button 
+              onClick={() => navigate('/')}
+              variant="outline"
+              className="border-light-gray text-white hover:bg-light-gray/10"
+            >
+              Voltar para Home
             </Button>
-          </motion.div>
-        </div>
+            
+            <Button 
+              onClick={() => navigate('/auth')}
+              className="bg-neon-purple hover:bg-neon-purple/80"
+            >
+              Fazer Login
+            </Button>
+          </div>
+        </motion.div>
       </div>
       
       <Footer />

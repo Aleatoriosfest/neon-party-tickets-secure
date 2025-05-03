@@ -14,6 +14,8 @@ import Admin from "./pages/Admin";
 import UserAccount from "./pages/UserAccount";
 import AccessDenied from "./pages/AccessDenied";
 import NotFound from "./pages/NotFound";
+import Auth from "./pages/Auth";
+import AdminDashboard from "./pages/AdminDashboard";
 
 // Create a new QueryClient instance
 const queryClient = new QueryClient();
@@ -28,6 +30,7 @@ const App = () => {
               <MotionConfig reducedMotion="user">
                 <Routes>
                   <Route path="/" element={<Index />} />
+                  <Route path="/auth" element={<Auth />} />
                   <Route path="/meus-ingressos" element={
                     <ProtectedRoute>
                       <MyTickets />
@@ -41,6 +44,11 @@ const App = () => {
                   <Route path="/admin" element={
                     <ProtectedRoute requireAdmin>
                       <Admin />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/admin/dashboard" element={
+                    <ProtectedRoute requireAdmin>
+                      <AdminDashboard />
                     </ProtectedRoute>
                   } />
                   <Route path="/access-denied" element={<AccessDenied />} />

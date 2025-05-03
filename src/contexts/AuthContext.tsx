@@ -3,9 +3,11 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { useNavigate } from 'react-router-dom';
 import { supabase, User } from '@/lib/supabase';
 import { toast } from '@/components/ui/sonner';
+import { Session } from '@supabase/supabase-js';
 
 interface AuthContextType {
   user: User | null;
+  session: Session | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name: string, role: 'user' | 'admin') => Promise<void>;
@@ -29,19 +31,62 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check active sessions and set user on mount
+    // Set up auth state listener
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, sessionData) => {
+        setSession(sessionData);
+        
+        if (event === 'SIGNED_IN' && sessionData) {
+          setLoading(true);
+          try {
+            // Get user profile data after sign in
+            const { data: userData, error: profileError } = await supabase
+              .from('usuarios')
+              .select('*')
+              .eq('id', sessionData.user.id)
+              .single();
+              
+            if (!profileError && userData) {
+              setUser({
+                id: sessionData.user.id,
+                email: sessionData.user.email || '',
+                name: userData.name,
+                role: userData.role as 'admin' | 'user',
+              });
+              
+              // Redirect based on role
+              if (userData.role === 'admin') {
+                navigate('/admin');
+              } else {
+                navigate('/meus-ingressos');
+              }
+            }
+          } catch (error) {
+            console.error('Error fetching user profile:', error);
+          } finally {
+            setLoading(false);
+          }
+        } else if (event === 'SIGNED_OUT') {
+          setUser(null);
+          setSession(null);
+          navigate('/');
+        }
+      }
+    );
+
+    // Check active session on mount
     const checkSession = async () => {
       try {
         const { data, error } = await supabase.auth.getSession();
         
-        if (error) {
-          console.error('Error fetching session:', error);
-          setUser(null);
-        } else if (data?.session) {
+        if (!error && data?.session) {
+          setSession(data.session);
+          
           // Get user profile data with role information
           const { data: userData, error: profileError } = await supabase
             .from('usuarios')
@@ -49,14 +94,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             .eq('id', data.session.user.id)
             .single();
             
-          if (profileError) {
-            console.error('Error fetching user profile:', profileError);
-          } else if (userData) {
+          if (!profileError && userData) {
             setUser({
               id: data.session.user.id,
               email: data.session.user.email || '',
-              name: userData.name || '',
-              role: userData.role || 'user',
+              name: userData.name,
+              role: userData.role as 'admin' | 'user',
             });
           }
         }
@@ -69,35 +112,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     checkSession();
 
-    // Set up auth state listener
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (event === 'SIGNED_IN' && session) {
-          // Get user profile data after sign in
-          const { data: userData, error: profileError } = await supabase
-            .from('usuarios')
-            .select('*')
-            .eq('id', session.user.id)
-            .single();
-            
-          if (!profileError && userData) {
-            setUser({
-              id: session.user.id,
-              email: session.user.email || '',
-              name: userData.name || '',
-              role: userData.role || 'user',
-            });
-          }
-        } else if (event === 'SIGNED_OUT') {
-          setUser(null);
-        }
-      }
-    );
-
     return () => {
       authListener?.subscription.unsubscribe();
     };
-  }, []);
+  }, [navigate]);
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -112,33 +130,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       if (data?.user) {
-        // Get user profile data with role information
-        const { data: userData, error: profileError } = await supabase
-          .from('usuarios')
-          .select('*')
-          .eq('id', data.user.id)
-          .single();
-          
-        if (profileError) {
-          console.error('Error fetching user profile:', profileError);
-          toast.error('Erro ao carregar perfil do usuário');
-        } else if (userData) {
-          setUser({
-            id: data.user.id,
-            email: data.user.email || '',
-            name: userData.name || '',
-            role: userData.role || 'user',
-          });
-          
-          // Redirect based on role
-          if (userData.role === 'admin') {
-            navigate('/admin');
-            toast.success('Bem-vindo ao painel de administração!');
-          } else {
-            navigate('/meus-ingressos');
-            toast.success('Login realizado com sucesso!');
-          }
-        }
+        // User data is set in the auth state change listener
+        toast.success('Login realizado com sucesso!');
       }
     } catch (error: any) {
       console.error('Error signing in:', error);
@@ -155,6 +148,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const { data, error } = await supabase.auth.signUp({ 
         email, 
         password,
+        options: {
+          data: {
+            name,
+            role
+          }
+        }
       });
 
       if (error) {
@@ -162,38 +161,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       if (data?.user) {
-        // Create user profile in usuarios table with role
-        const { error: profileError } = await supabase
-          .from('usuarios')
-          .insert([
-            { 
-              id: data.user.id,
-              email,
-              name,
-              role
-            }
-          ]);
-
-        if (profileError) {
-          console.error('Error creating user profile:', profileError);
-          throw profileError;
-        }
-
-        setUser({
-          id: data.user.id,
-          email: email,
-          name: name,
-          role: role,
-        });
-        
         toast.success('Conta criada com sucesso!');
-        
-        // Redirect based on role
-        if (role === 'admin') {
-          navigate('/admin');
-        } else {
-          navigate('/meus-ingressos');
-        }
+        // The user data is handled in the auth state change listener
       }
     } catch (error: any) {
       console.error('Error signing up:', error);
@@ -207,8 +176,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setLoading(true);
       await supabase.auth.signOut();
-      setUser(null);
-      navigate('/');
+      // State is cleaned up in the auth state change listener
       toast.info('Logout realizado com sucesso');
     } catch (error: any) {
       console.error('Error signing out:', error);
@@ -222,6 +190,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     <AuthContext.Provider
       value={{
         user,
+        session,
         loading,
         signIn,
         signUp,

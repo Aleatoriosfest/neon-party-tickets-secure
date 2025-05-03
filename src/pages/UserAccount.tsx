@@ -67,7 +67,7 @@ const UserAccount: React.FC = () => {
       const { error } = await supabase
         .from('usuarios')
         .update({ 
-          name: values.name,
+          name: values.name 
         })
         .eq('id', user.id);
 

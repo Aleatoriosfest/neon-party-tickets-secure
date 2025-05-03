@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -16,57 +15,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from '@/contexts/AuthContext';
-import { Shield, Ticket, User, Settings, LogOut } from 'lucide-react';
+import { Shield, Ticket, User, Settings, LogOut, CalendarPlus, BarChart } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
-  const { user, signIn, signUp, signOut, isAdmin } = useAuth();
+  const { user, signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsProcessing(true);
-    
-    try {
-      await signIn(email, password);
-      setShowAuthModal(false);
-    } catch (error) {
-      console.error('Login error:', error);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsProcessing(true);
-    
-    // Form validation
-    if (password !== confirmPassword) {
-      toast.error('As senhas não coincidem. Tente novamente.');
-      setIsProcessing(false);
-      return;
-    }
-
-    if (password.length < 8) {
-      toast.error('A senha deve ter pelo menos 8 caracteres.');
-      setIsProcessing(false);
-      return;
-    }
-    
-    try {
-      await signUp(email, password, name, 'user');
-      setShowAuthModal(false);
-    } catch (error) {
-      console.error('Registration error:', error);
-    } finally {
-      setIsProcessing(false);
-    }
+  const handleNavigate = (path: string) => {
+    navigate(path);
   };
 
   return (
@@ -126,10 +83,24 @@ const Navbar: React.FC = () => {
                       <>
                         <DropdownMenuItem 
                           className="cursor-pointer hover:bg-gray-800"
-                          onClick={() => navigate('/admin')}
+                          onClick={() => handleNavigate('/admin/dashboard')}
                         >
                           <Shield className="mr-2 h-4 w-4" />
                           <span>Painel de Controle</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          className="cursor-pointer hover:bg-gray-800"
+                          onClick={() => handleNavigate('/admin')}
+                        >
+                          <CalendarPlus className="mr-2 h-4 w-4" />
+                          <span>Gerenciar Eventos</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          className="cursor-pointer hover:bg-gray-800"
+                          onClick={() => handleNavigate('/admin')}
+                        >
+                          <BarChart className="mr-2 h-4 w-4" />
+                          <span>Ver Ingressos Vendidos</span>
                         </DropdownMenuItem>
                       </>
                     )}
@@ -139,21 +110,21 @@ const Navbar: React.FC = () => {
                       <>
                         <DropdownMenuItem 
                           className="cursor-pointer hover:bg-gray-800"
-                          onClick={() => navigate('/meus-ingressos')}
+                          onClick={() => handleNavigate('/meus-ingressos')}
                         >
                           <Ticket className="mr-2 h-4 w-4" />
                           <span>Meus Ingressos</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem 
                           className="cursor-pointer hover:bg-gray-800"
-                          onClick={() => navigate('/minha-conta')}
+                          onClick={() => handleNavigate('/minha-conta')}
                         >
                           <User className="mr-2 h-4 w-4" />
                           <span>Editar Perfil</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem 
                           className="cursor-pointer hover:bg-gray-800"
-                          onClick={() => navigate('/minha-conta')}
+                          onClick={() => handleNavigate('/minha-conta')}
                         >
                           <Settings className="mr-2 h-4 w-4" />
                           <span>Trocar Senha</span>
@@ -173,159 +144,33 @@ const Navbar: React.FC = () => {
                 </DropdownMenu>
               </>
             ) : (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="hidden md:flex border-neon-blue text-neon-blue hover:bg-neon-blue hover:text-black"
-                onClick={() => setShowAuthModal(true)}
-                data-login-button="true"
-              >
-                Entrar
-              </Button>
-            )}
-            
-            {!user && (
-              <Avatar 
-                className="h-8 w-8 ring-2 ring-neon-blue/50 cursor-pointer hover:ring-neon-blue transition-all"
-                onClick={() => setShowAuthModal(true)}
-              >
-                <AvatarImage src="" />
-                <AvatarFallback className="bg-light-gray text-neon-blue">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                  </svg>
-                </AvatarFallback>
-              </Avatar>
+              <>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="hidden md:flex border-neon-blue text-neon-blue hover:bg-neon-blue hover:text-black"
+                  onClick={() => navigate('/auth')}
+                  data-login-button="true"
+                >
+                  Entrar
+                </Button>
+                
+                <Avatar 
+                  className="h-8 w-8 ring-2 ring-neon-blue/50 cursor-pointer hover:ring-neon-blue transition-all"
+                  onClick={() => navigate('/auth')}
+                >
+                  <AvatarImage src="" />
+                  <AvatarFallback className="bg-light-gray text-neon-blue">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                  </AvatarFallback>
+                </Avatar>
+              </>
             )}
           </div>
         </div>
       </div>
-
-      {/* Auth Modal with Tabs for Login/Register */}
-      <Dialog open={showAuthModal} onOpenChange={setShowAuthModal}>
-        <DialogContent className="sm:max-w-md bg-dark-gray text-white">
-          <DialogHeader>
-            <DialogTitle className="text-2xl text-neon-blue">Acesso</DialogTitle>
-            <DialogDescription className="text-gray-300">
-              Faça login ou crie sua conta para ter acesso completo ao site.
-            </DialogDescription>
-          </DialogHeader>
-
-          <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="login" className="text-white">Login</TabsTrigger>
-              <TabsTrigger value="register" className="text-white">Criar Conta</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="login">
-              <form onSubmit={handleLogin} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="seu@email.com"
-                    className="bg-gray-800 border-gray-700 focus:border-neon-blue"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Senha</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="bg-gray-800 border-gray-700 focus:border-neon-blue"
-                    required
-                  />
-                </div>
-
-                <div className="bg-gray-900 p-3 rounded-md text-sm">
-                  <p className="text-gray-400 mb-1">Contas de teste disponíveis:</p>
-                  <p className="text-neon-blue">Admin: admin@aleatoriosfest.com / Admin123!</p>
-                  <p className="text-neon-purple">Cliente: customer@aleatoriosfest.com / Customer123!</p>
-                </div>
-
-                <DialogFooter>
-                  <Button 
-                    type="submit"
-                    disabled={isProcessing} 
-                    className="w-full bg-neon-blue hover:bg-neon-blue/80 text-black"
-                  >
-                    {isProcessing ? 'Processando...' : 'Entrar'}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </TabsContent>
-            
-            <TabsContent value="register">
-              <form onSubmit={handleRegister} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="register-name">Nome Completo</Label>
-                  <Input
-                    id="register-name"
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Seu nome completo"
-                    className="bg-gray-800 border-gray-700 focus:border-neon-blue"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="register-email">Email</Label>
-                  <Input
-                    id="register-email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="seu@email.com"
-                    className="bg-gray-800 border-gray-700 focus:border-neon-blue"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="register-password">Senha</Label>
-                  <Input
-                    id="register-password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="bg-gray-800 border-gray-700 focus:border-neon-blue"
-                    placeholder="Mínimo 8 caracteres"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="register-confirm-password">Confirmar Senha</Label>
-                  <Input
-                    id="register-confirm-password"
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="bg-gray-800 border-gray-700 focus:border-neon-blue"
-                    placeholder="Confirme sua senha"
-                    required
-                  />
-                </div>
-
-                <DialogFooter>
-                  <Button 
-                    type="submit"
-                    disabled={isProcessing} 
-                    className="w-full bg-neon-purple hover:bg-neon-purple/80 text-white"
-                  >
-                    {isProcessing ? 'Processando...' : 'Criar Conta'}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </TabsContent>
-          </Tabs>
-        </DialogContent>
-      </Dialog>
     </header>
   );
 };
