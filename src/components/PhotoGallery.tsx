@@ -94,8 +94,11 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
 
   // Function to check if all or most images are loaded
   const areImagesReady = useCallback(() => {
+    // Even if no images are loaded yet, consider ready after a timeout
+    if (imagesLoaded.length === 0) return true;
+    
     const loadedCount = imagesLoaded.filter(Boolean).length;
-    return loadedCount > 0 && loadedCount >= photos.length * 0.7; // 70% loaded is good enough
+    return loadedCount > 0 && loadedCount >= Math.min(3, photos.length); // Just need a few images loaded
   }, [imagesLoaded, photos.length]);
   
   return (
@@ -132,7 +135,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
               >
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: imagesLoaded[index] ? 1 : 0, y: imagesLoaded[index] ? 0 : 20 }}
+                  animate={{ opacity: 1, y: 0 }}
                   whileHover={{ 
                     scale: 1.05,
                     rotateY: 5, 
@@ -151,6 +154,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
                     )}
                     loading="lazy"
                     onLoad={() => handleImageLoad(index)}
+                    onError={() => handleImageLoad(index)} // Mark as loaded even on error
                   />
                 </motion.div>
               </CarouselItem>
@@ -192,6 +196,12 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
               src={photos[currentImageIndex]} 
               alt={`Foto ampliada ${currentImageIndex + 1}`}
               className="max-w-full max-h-[80vh] object-contain"
+              onError={(e) => {
+                // Fallback for image error
+                const target = e.target as HTMLImageElement;
+                target.onerror = null; 
+                target.src = "https://placehold.co/600x400?text=Imagem+não+disponível";
+              }}
             />
             
             {/* Navigation controls */}

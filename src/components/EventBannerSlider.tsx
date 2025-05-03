@@ -40,36 +40,59 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
 
   // Preload images to avoid black screen
   useEffect(() => {
+    let mounted = true;
+    
     const preloadImages = async () => {
-      const promises = carouselImages.map((item) => {
-        return new Promise((resolve, reject) => {
-          const img = new Image();
-          img.src = item.image;
-          img.onload = resolve;
-          img.onerror = reject;
-        });
-      });
-
       try {
-        await Promise.all(promises);
-        setImagesLoaded(true);
+        const promises = carouselImages.map((item) => {
+          return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = resolve;
+            img.onerror = () => {
+              console.log(`Failed to load image: ${item.image}`);
+              // Resolve anyway to prevent blocking other images
+              resolve(null);
+            };
+            img.src = item.image;
+          });
+        });
+
+        await Promise.allSettled(promises);
+        
+        if (mounted) {
+          setImagesLoaded(true);
+        }
       } catch (error) {
-        console.error("Error loading images:", error);
+        console.error("Error in image loading process:", error);
         // Still set loaded to true to avoid infinite loading
-        setImagesLoaded(true);
+        if (mounted) {
+          setImagesLoaded(true);
+        }
       }
     };
     
     preloadImages();
+    
+    return () => {
+      mounted = false;
+    };
   }, []);
   
   // Auto rotate carousel every 5 seconds
   useEffect(() => {
     if (!imagesLoaded) return;
+    
+    let mounted = true;
 
     const startAutoRotation = () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      
       intervalRef.current = setInterval(() => {
-        setCurrentIndex(prevIndex => (prevIndex + 1) % carouselImages.length);
+        if (mounted) {
+          setCurrentIndex(prevIndex => (prevIndex + 1) % carouselImages.length);
+        }
       }, 5000);
     };
 
@@ -77,8 +100,10 @@ const EventBannerSlider: React.FC<EventBannerSliderProps> = ({
     
     // Clean up interval on unmount
     return () => {
+      mounted = false;
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
     };
   }, [carouselImages.length, imagesLoaded]);
