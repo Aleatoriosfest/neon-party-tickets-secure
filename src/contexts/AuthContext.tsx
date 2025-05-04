@@ -36,44 +36,46 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Set up auth state listener
+    // Set up auth state listener first to prevent race conditions
     const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, sessionData) => {
+      (event, sessionData) => {
+        // Use synchronous updates first
         setSession(sessionData);
         
         if (event === 'SIGNED_IN' && sessionData) {
-          setLoading(true);
-          try {
-            // Get user profile data after sign in
-            const { data: userData, error: profileError } = await supabase
-              .from('usuarios')
-              .select('*')
-              .eq('id', sessionData.user.id)
-              .single();
-              
-            if (!profileError && userData) {
-              setUser({
-                id: sessionData.user.id,
-                email: sessionData.user.email || '',
-                name: userData.name,
-                role: userData.role as 'admin' | 'user',
-              });
-              
-              // Redirect based on role
-              if (userData.role === 'admin') {
-                navigate('/admin');
-              } else {
-                navigate('/meus-ingressos');
+          // Defer Supabase calls with setTimeout to prevent deadlocks
+          setTimeout(async () => {
+            try {
+              // Get user profile data after sign in
+              const { data: userData, error: profileError } = await supabase
+                .from('usuarios')
+                .select('*')
+                .eq('id', sessionData.user.id)
+                .single();
+                
+              if (!profileError && userData) {
+                setUser({
+                  id: sessionData.user.id,
+                  email: sessionData.user.email || '',
+                  name: userData.name,
+                  role: userData.role as 'admin' | 'user',
+                });
+                
+                // Redirect based on role
+                if (userData.role === 'admin') {
+                  navigate('/admin');
+                } else {
+                  navigate('/meus-ingressos');
+                }
               }
+            } catch (error) {
+              console.error('Error fetching user profile:', error);
+            } finally {
+              setLoading(false);
             }
-          } catch (error) {
-            console.error('Error fetching user profile:', error);
-          } finally {
-            setLoading(false);
-          }
+          }, 0);
         } else if (event === 'SIGNED_OUT') {
           setUser(null);
-          setSession(null);
           navigate('/');
         }
       }
@@ -113,7 +115,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkSession();
 
     return () => {
-      authListener?.subscription.unsubscribe();
+      // Clean up the listener when component unmounts
+      if (authListener && authListener.subscription) {
+        authListener.subscription.unsubscribe();
+      }
     };
   }, [navigate]);
 
@@ -136,6 +141,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error: any) {
       console.error('Error signing in:', error);
       toast.error(error.message || 'Erro ao fazer login');
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -167,6 +173,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error: any) {
       console.error('Error signing up:', error);
       toast.error(error.message || 'Erro ao criar conta');
+      throw error;
     } finally {
       setLoading(false);
     }

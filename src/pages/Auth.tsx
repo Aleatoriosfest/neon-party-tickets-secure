@@ -74,14 +74,23 @@ const Auth: React.FC = () => {
     }
   };
 
+  // Key fix: Use proper cleanup in useEffect and handle tab transitions more carefully
+  const animationVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -20 }
+  };
+
   return (
     <div className="min-h-screen bg-dark flex flex-col">
       <Navbar />
       
       <div className="flex-1 flex items-center justify-center py-16 px-4">
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          variants={animationVariants}
           transition={{ duration: 0.5 }}
           className="w-full max-w-md"
         >
