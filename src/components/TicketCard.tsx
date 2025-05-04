@@ -1,8 +1,11 @@
 
-import React from 'react';
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Calendar, MapPin, Download, Ticket, QrCode } from 'lucide-react';
+import { toast } from '@/components/ui/sonner';
 
 interface TicketCardProps {
   id: string;
@@ -14,56 +17,121 @@ interface TicketCardProps {
   location: string;
 }
 
-const TicketCard: React.FC<TicketCardProps> = ({ 
-  id, eventName, eventDate, ticketType, price, qrCode, location 
+const TicketCard: React.FC<TicketCardProps> = ({
+  id,
+  eventName,
+  eventDate,
+  ticketType,
+  price,
+  qrCode,
+  location
 }) => {
+  const [showQrCodeModal, setShowQrCodeModal] = useState(false);
+  
+  const handleDownloadTicket = () => {
+    // In a real app, this would generate a PDF ticket for download
+    toast.success("Ingresso baixado com sucesso!");
+  };
+  
   return (
-    <Card className="glass overflow-hidden border-2 border-neon-blue/30 hover:border-neon-blue/70 transition-all">
-      <CardContent className="p-5">
-        <div className="flex flex-col md:flex-row md:items-center gap-4">
-          <div className="flex-1">
-            <Badge className="mb-2 bg-neon-blue text-black">
-              {ticketType}
-            </Badge>
-            <h3 className="text-xl md:text-2xl font-bold mb-2 text-white">{eventName}</h3>
-            <div className="flex flex-col space-y-2 text-sm text-gray-300 mb-4">
-              <div className="flex items-center">
-                <svg className="w-4 h-4 mr-1 text-neon-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
-                <span>{eventDate}</span>
+    <>
+      <Card className="bg-dark-gray border-light-gray text-white overflow-hidden">
+        <CardContent className="p-0">
+          <div className="flex flex-col md:flex-row">
+            <div className="md:w-1/4 bg-gradient-to-br from-neon-blue/20 to-neon-purple/30 p-6 flex items-center justify-center">
+              <div className="text-center">
+                <Ticket className="h-12 w-12 mx-auto mb-2 text-neon-blue" />
+                <h3 className="font-bold">{ticketType}</h3>
+                <p className="text-neon-blue font-semibold">{price}</p>
               </div>
-              <div className="flex items-center">
-                <svg className="w-4 h-4 mr-1 text-neon-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
-                <span>{location}</span>
+            </div>
+            
+            <div className="md:w-3/4 p-6">
+              <div className="flex flex-col md:flex-row justify-between">
+                <div>
+                  <h2 className="text-xl font-bold mb-2">{eventName}</h2>
+                  <div className="flex items-center mb-2 text-gray-300">
+                    <Calendar className="h-4 w-4 mr-2 text-neon-purple" />
+                    <span>{eventDate}</span>
+                  </div>
+                  <div className="flex items-center text-gray-300">
+                    <MapPin className="h-4 w-4 mr-2 text-neon-purple" />
+                    <span>{location}</span>
+                  </div>
+                  
+                  <div className="mt-3 pt-3 border-t border-gray-700/50">
+                    <p className="text-xs text-gray-400">Código: {id}</p>
+                  </div>
+                </div>
+                
+                <div className="flex flex-col space-y-2 mt-4 md:mt-0">
+                  <Button
+                    variant="outline"
+                    className="border-neon-purple text-neon-purple hover:bg-neon-purple/20"
+                    onClick={() => setShowQrCodeModal(true)}
+                  >
+                    <QrCode className="h-4 w-4 mr-2" />
+                    Ver QR Code
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    className="border-neon-blue text-neon-blue hover:bg-neon-blue/20"
+                    onClick={handleDownloadTicket}
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Baixar Ingresso
+                  </Button>
+                </div>
               </div>
-              <div className="flex items-center">
-                <svg className="w-4 h-4 mr-1 text-neon-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                </svg>
-                <span>{price}</span>
-              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Dialog open={showQrCodeModal} onOpenChange={setShowQrCodeModal}>
+        <DialogContent className="bg-dark-gray text-white border-light-gray">
+          <DialogHeader>
+            <DialogTitle className="text-center text-2xl">Seu Ingresso</DialogTitle>
+          </DialogHeader>
+          
+          <div className="flex flex-col items-center py-4">
+            <div className="mb-6 text-center">
+              <h2 className="text-xl font-bold mb-1">{eventName}</h2>
+              <p className="text-gray-300">{eventDate}</p>
+              <p className="text-neon-purple">{ticketType}</p>
+            </div>
+            
+            <div className="bg-white p-4 rounded-lg mb-4">
+              <img 
+                src={qrCode}
+                alt="QR Code do Ingresso" 
+                className="w-56 h-56"
+              />
+            </div>
+            
+            <p className="text-center text-gray-300 mb-6">
+              Apresente este QR Code na entrada do evento
+            </p>
+            
+            <div className="text-center text-xs text-gray-500">
+              <p>ID: {id}</p>
+              <p>Este ingresso é pessoal e intransferível</p>
             </div>
           </div>
           
-          <div className="flex flex-col items-center">
-            <div className="bg-white p-2 rounded-lg">
-              <img src={qrCode} alt="QR Code" className="w-32 h-32" />
-            </div>
-            <p className="text-xs text-center mt-2 text-gray-400">Apresente este QR Code na entrada</p>
-          </div>
-        </div>
-      </CardContent>
-      <CardFooter className="p-4 pt-0 flex justify-between items-center">
-        <div className="text-xs text-gray-400">ID: {id}</div>
-        <Badge variant="outline" className="text-neon-purple border-neon-purple">
-          Válido
-        </Badge>
-      </CardFooter>
-    </Card>
+          <DialogFooter>
+            <Button 
+              className="w-full bg-neon-blue hover:bg-neon-blue/80"
+              onClick={handleDownloadTicket}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Baixar Ingresso
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

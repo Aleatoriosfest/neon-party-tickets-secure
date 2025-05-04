@@ -63,9 +63,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 
                 // Redirect based on role
                 if (userData.role === 'admin') {
-                  navigate('/admin');
+                  navigate('/admin/dashboard');
                 } else {
-                  navigate('/meus-ingressos');
+                  navigate('/minha-conta');
                 }
               }
             } catch (error) {

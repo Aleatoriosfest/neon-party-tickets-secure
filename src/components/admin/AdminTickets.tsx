@@ -374,108 +374,99 @@ const AdminTickets: React.FC = () => {
       </Dialog>
       
       {/* Ticket Details Modal */}
-      {currentTicket && (
-        <Dialog open={showDetailsModal} onOpenChange={setShowDetailsModal}>
+      <Dialog open={showDetailsModal} onOpenChange={setShowDetailsModal}>
+        {currentTicket && (
           <DialogContent className="bg-dark-gray text-white border border-light-gray/30 max-w-2xl">
             <DialogHeader>
-              <DialogTitle className="text-2xl">Detalhes do Ingresso</DialogTitle>
+              <DialogTitle className="flex items-center">
+                <QrCode className="mr-2 text-neon-blue" />
+                Detalhes do Ingresso #{currentTicket.id}
+              </DialogTitle>
             </DialogHeader>
             
-            <div className="bg-dark-gray/50 p-4 rounded-lg">
-              <div className="flex justify-between mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
                 <div>
-                  <h3 className="text-xl font-bold text-white">{currentTicket.id}</h3>
-                  <p className="text-gray-400">Compra em: {currentTicket.purchaseDate}</p>
+                  <h3 className="text-gray-400 text-sm">Evento</h3>
+                  <p className="text-lg font-medium">{currentTicket.eventName}</p>
                 </div>
+                
                 <div>
-                  <span className={`px-2 py-1 rounded-full text-xs ${
-                    currentTicket.status === 'Válido' 
-                      ? 'bg-green-900/30 text-green-400' 
-                      : currentTicket.status === 'Usado'
-                        ? 'bg-blue-900/30 text-blue-400'
-                        : 'bg-red-900/30 text-red-400'
-                  }`}>
-                    {currentTicket.status}
-                  </span>
+                  <h3 className="text-gray-400 text-sm">Data</h3>
+                  <p className="flex items-center">
+                    <Calendar size={14} className="mr-1 text-neon-purple" />
+                    {currentTicket.eventDate}
+                  </p>
+                </div>
+                
+                <div>
+                  <h3 className="text-gray-400 text-sm">Cliente</h3>
+                  <p className="font-medium">{currentTicket.customerName}</p>
+                  <p className="text-sm text-gray-400">{currentTicket.customerEmail}</p>
+                </div>
+                
+                <div>
+                  <h3 className="text-gray-400 text-sm">Detalhes da Compra</h3>
+                  <p><span className="text-gray-400">Tipo:</span> {currentTicket.ticketType}</p>
+                  <p><span className="text-gray-400">Valor:</span> {currentTicket.price}</p>
+                  <p><span className="text-gray-400">Data da Compra:</span> {currentTicket.purchaseDate}</p>
                 </div>
               </div>
               
-              <div className="flex justify-center mb-6">
-                <img 
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${currentTicket.id}`}
-                  alt="QR Code"
-                  className="border-4 border-white h-32 w-32"
-                />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h4 className="text-gray-400 text-sm">Evento</h4>
-                  <p className="text-white">{currentTicket.eventName}</p>
+              <div className="flex flex-col items-center justify-center">
+                <div className="bg-white p-4 rounded-lg mb-4">
+                  <img 
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${currentTicket.id}`}
+                    alt="QR Code do Ingresso"
+                    className="w-32 h-32"
+                  />
                 </div>
-                <div>
-                  <h4 className="text-gray-400 text-sm">Data</h4>
-                  <p className="text-white">{currentTicket.eventDate}</p>
+                
+                <div className={`px-4 py-2 rounded-full text-sm font-medium mb-4 ${
+                  currentTicket.status === 'Válido' 
+                    ? 'bg-green-900/30 text-green-400' 
+                    : currentTicket.status === 'Usado'
+                      ? 'bg-blue-900/30 text-blue-400'
+                      : 'bg-red-900/30 text-red-400'
+                }`}>
+                  Status: {currentTicket.status}
                 </div>
-                <div>
-                  <h4 className="text-gray-400 text-sm">Cliente</h4>
-                  <p className="text-white">{currentTicket.customerName}</p>
-                </div>
-                <div>
-                  <h4 className="text-gray-400 text-sm">Email</h4>
-                  <p className="text-white">{currentTicket.customerEmail}</p>
-                </div>
-                <div>
-                  <h4 className="text-gray-400 text-sm">Tipo</h4>
-                  <p className="text-white">{currentTicket.ticketType}</p>
-                </div>
-                <div>
-                  <h4 className="text-gray-400 text-sm">Valor</h4>
-                  <p className="text-white">{currentTicket.price}</p>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    variant="outline" 
+                    className="border-green-500 text-green-400 hover:bg-green-900/20"
+                    onClick={() => updateTicketStatus(currentTicket.id, 'Válido')}
+                    disabled={currentTicket.status === 'Válido'}
+                  >
+                    <CheckCircle size={16} className="mr-1" />
+                    Validar
+                  </Button>
+                  
+                  <Button
+                    variant="outline" 
+                    className="border-red-500 text-red-400 hover:bg-red-900/20"
+                    onClick={() => updateTicketStatus(currentTicket.id, 'Cancelado')}
+                    disabled={currentTicket.status === 'Cancelado'}
+                  >
+                    <XCircle size={16} className="mr-1" />
+                    Cancelar
+                  </Button>
                 </div>
               </div>
             </div>
             
-            <div className="flex justify-between mt-4">
-              <Button
-                variant="outline"
-                className="border-red-500 text-red-400 hover:bg-red-500/10"
-                onClick={() => updateTicketStatus(currentTicket.id, 'Cancelado')}
+            <DialogFooter>
+              <Button 
+                onClick={() => setShowDetailsModal(false)}
+                className="bg-light-gray/20 hover:bg-light-gray/30 text-white"
               >
-                <XCircle size={16} className="mr-2" /> Cancelar Ingresso
+                Fechar
               </Button>
-              
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  className="border-light-gray text-gray-300 hover:bg-light-gray/10"
-                  onClick={() => setShowDetailsModal(false)}
-                >
-                  Fechar
-                </Button>
-                
-                {currentTicket.status !== 'Usado' && (
-                  <Button
-                    className="bg-neon-blue hover:bg-neon-blue/80 text-black"
-                    onClick={() => updateTicketStatus(currentTicket.id, 'Usado')}
-                  >
-                    <CheckCircle size={16} className="mr-2" /> Marcar como Usado
-                  </Button>
-                )}
-                
-                {currentTicket.status !== 'Válido' && (
-                  <Button
-                    className="bg-green-600 hover:bg-green-600/80 text-white"
-                    onClick={() => updateTicketStatus(currentTicket.id, 'Válido')}
-                  >
-                    <CheckCircle size={16} className="mr-2" /> Validar Ingresso
-                  </Button>
-                )}
-              </div>
-            </div>
+            </DialogFooter>
           </DialogContent>
-        </Dialog>
-      )}
+        )}
+      </Dialog>
     </div>
   );
 };
