@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import EventBannerSlider from '@/components/EventBannerSlider';
 import EventHighlights from '@/components/EventHighlights';
@@ -14,9 +14,11 @@ import ArtistTimeline from '@/components/ArtistTimeline';
 import FAQSection from '@/components/FAQSection';
 import SocialShare from '@/components/SocialShare';
 import PixPayment from '@/components/PixPayment';
+import PurchaseTicketModal from '@/components/PurchaseTicketModal';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from '@/components/ui/sonner';
 
 // Mock data - in a real app this would come from a database based on the event ID
 const events = {
@@ -221,6 +223,8 @@ const EventDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [event, setEvent] = useState<any>(null);
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   
   useEffect(() => {
     if (id && events[id as keyof typeof events]) {
@@ -230,6 +234,18 @@ const EventDetail: React.FC = () => {
       navigate('/eventos');
     }
   }, [id, navigate]);
+  
+  const handleBuyTicket = () => {
+    if (!user) {
+      // Store the intended destination
+      localStorage.setItem('redirectAfterLogin', `/eventos/${id}`);
+      toast.info('Faça login para comprar ingressos');
+      navigate('/auth');
+      return;
+    }
+    
+    setShowPurchaseModal(true);
+  };
   
   if (!event) {
     return (
@@ -273,6 +289,17 @@ const EventDetail: React.FC = () => {
       {/* Countdown Timer */}
       <CountdownTimer targetDate={event.targetDate} />
       
+      {/* Botão de compra após o countdown */}
+      <div className="container mx-auto px-4 py-6 text-center">
+        <Button 
+          onClick={handleBuyTicket}
+          className="bg-neon-blue hover:bg-neon-blue/80 text-black font-bold text-lg px-8 py-6"
+          size="lg"
+        >
+          COMPRAR INGRESSO
+        </Button>
+      </div>
+      
       {/* Event Highlights */}
       <EventHighlights highlights={event.highlights} />
       
@@ -302,8 +329,26 @@ const EventDetail: React.FC = () => {
       {/* Social Share */}
       <SocialShare instagramUrls={event.instagramUrls} />
       
-      {/* CTA Section */}
-      <CTASection />
+      {/* CTA Section with Buy Ticket Button */}
+      <section className="py-16 bg-gradient-to-br from-dark to-dark-gray">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Garanta seu lugar nesse evento!</h2>
+          <Button 
+            onClick={handleBuyTicket}
+            className="bg-neon-blue hover:bg-neon-blue/80 text-black font-bold text-lg px-8 py-6"
+            size="lg"
+          >
+            COMPRAR AGORA
+          </Button>
+        </div>
+      </section>
+      
+      {/* Purchase Modal */}
+      <PurchaseTicketModal 
+        isOpen={showPurchaseModal} 
+        onClose={() => setShowPurchaseModal(false)} 
+        event={event}
+      />
       
       {/* Footer */}
       <Footer />
