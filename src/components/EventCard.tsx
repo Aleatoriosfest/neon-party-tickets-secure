@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Link } from 'react-router-dom';
 
 interface EventCardProps {
   id: string;
@@ -49,13 +50,15 @@ const EventCard: React.FC<EventCardProps> = ({
       </CardContent>
       <CardFooter className="flex justify-between items-center p-4 pt-0">
         <div className="text-neon-blue font-bold">{price}</div>
-        <Button 
-          size="sm" 
-          variant="outline" 
-          className="border-neon-blue text-neon-blue hover:bg-neon-blue hover:text-black"
-        >
-          Ver Detalhes
-        </Button>
+        <Link to={`/eventos/${id}`}>
+          <Button 
+            size="sm" 
+            variant="outline" 
+            className="border-neon-blue text-neon-blue hover:bg-neon-blue hover:text-black"
+          >
+            Ver Detalhes
+          </Button>
+        </Link>
       </CardFooter>
     </Card>
   );

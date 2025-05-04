@@ -8,7 +8,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import Index from "./pages/Index";
+
+// Pages
+import Home from "./pages/Home";
+import EventDetail from "./pages/EventDetail";
 import MyTickets from "./pages/MyTickets";
 import Admin from "./pages/Admin";
 import UserAccount from "./pages/UserAccount";
@@ -29,7 +32,9 @@ const App = () => {
             <TooltipProvider>
               <MotionConfig reducedMotion="user">
                 <Routes>
-                  <Route path="/" element={<Index />} />
+                  <Route path="/" element={<Home />} />
+                  <Route path="/eventos" element={<Home />} />
+                  <Route path="/eventos/:id" element={<EventDetail />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/meus-ingressos" element={
                     <ProtectedRoute>
@@ -62,12 +67,11 @@ const App = () => {
                     </ProtectedRoute>
                   } />
                   <Route path="/access-denied" element={<AccessDenied />} />
-                  <Route path="/payment-success" element={<Index />} />
-                  <Route path="/payment-canceled" element={<Index />} />
-                  <Route path="/politica-privacidade" element={<Index />} />
-                  <Route path="/termos-uso" element={<Index />} />
-                  <Route path="/eventos" element={<Index />} />
-                  <Route path="/sobre" element={<Index />} />
+                  <Route path="/payment-success" element={<Home />} />
+                  <Route path="/payment-canceled" element={<Home />} />
+                  <Route path="/politica-privacidade" element={<Home />} />
+                  <Route path="/termos-uso" element={<Home />} />
+                  <Route path="/sobre" element={<Home />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
