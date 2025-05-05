@@ -34,9 +34,9 @@ const PurchaseTicketModal: React.FC<PurchaseTicketModalProps> = ({ isOpen, onClo
       
       // Simulação do código do ingresso e QR code
       const ticketNumber = `EVENT-${event.id}-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
-      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${ticketNumber}`;
       
       // Salvar no Supabase
+      // Importante: Esta chamada não funcionará até que tenhamos a tabela tickets criada no Supabase
       const { data, error } = await supabase
         .from('tickets')
         .insert([
@@ -46,7 +46,7 @@ const PurchaseTicketModal: React.FC<PurchaseTicketModalProps> = ({ isOpen, onClo
             ticket_number: ticketNumber,
             status: 'valid',
             purchase_date: new Date().toISOString(),
-            price: event.price || 30.00, // Assuming a default price if not provided
+            price: event.price || 30.00, // Assumindo um preço padrão se não fornecido
             quantity: quantity
           }
         ]);

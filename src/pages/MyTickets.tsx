@@ -17,6 +17,7 @@ interface TicketType {
   status: 'valid' | 'used' | 'expired';
   purchase_date: string;
   price: number;
+  quantity: number;
   event_name?: string;
   event_date?: string;
   event_location?: string;
@@ -42,6 +43,7 @@ const MyTickets: React.FC = () => {
       
       try {
         // Fetch tickets from Supabase
+        // Importante: Esta chamada não funcionará até que tenhamos a tabela tickets criada no Supabase
         const { data, error } = await supabase
           .from('tickets')
           .select('*')
@@ -51,7 +53,7 @@ const MyTickets: React.FC = () => {
         
         // Process tickets to add event info from our mock data
         // In a real app, this would be a join query or a separate fetch
-        const processedTickets = data.map(ticket => {
+        const processedTickets = data.map((ticket: any) => {
           const eventInfo = eventsData[ticket.event_id as keyof typeof eventsData] || 
             { name: "Evento", date: "Data não disponível", location: "Local não disponível" };
           

@@ -32,4 +32,5 @@ export type Ticket = {
   status: 'valid' | 'used' | 'expired';
   purchase_date: string;
   price: number;
+  quantity: number;
 };
