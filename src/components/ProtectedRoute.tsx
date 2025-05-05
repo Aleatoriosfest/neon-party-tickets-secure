@@ -13,7 +13,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
   requireAdmin = false
 }) => {
-  const { user, session, loading } = useAuth(); // Changed isLoading to loading to match AuthContext
+  const { user, session, loading } = useAuth();
   const location = useLocation();
 
   useEffect(() => {

@@ -36,7 +36,6 @@ const PurchaseTicketModal: React.FC<PurchaseTicketModalProps> = ({ isOpen, onClo
       const ticketNumber = `EVENT-${event.id}-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
       
       // Salvar no Supabase
-      // The tickets table now exists in the database
       const { data, error } = await supabase
         .from('tickets')
         .insert([

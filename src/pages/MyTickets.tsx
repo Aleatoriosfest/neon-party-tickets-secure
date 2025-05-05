@@ -1,47 +1,50 @@
+
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import TicketCard from '@/components/TicketCard';
+import { motion } from 'framer-motion';
+import { TicketIcon, CalendarDays, MapPin, User } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/components/ui/sonner';
-import { Ticket, AlertCircle } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { TicketType, TicketWithEventType } from '@/types';
 
-interface TicketType {
-  id: string;
-  event_id: string;
-  user_id: string;
-  ticket_number: string;
-  status: 'valid' | 'used' | 'expired';
-  purchase_date: string;
-  price: number;
-  quantity: number;
-  event_name?: string;
-  event_date?: string;
-  event_location?: string;
-  qr_code?: string;
-}
-
-// Mock events data - This would come from the database in a real app
-const eventsData: Record<string, { name: string, date: string, location: string }> = {
-  "1": { name: "ALEATÓRIOS FEST", date: "31 de Maio, 2025", location: "Chácara Monero, Osasco - SP" },
-  "2": { name: "Element's Fest", date: "15 de Junho, 2025", location: "Arena XYZ, São Paulo - SP" },
-  "3": { name: "Projeto X", date: "20 de Julho, 2025", location: "Casa de Eventos ABC, Santo André - SP" },
-  "4": { name: "Open Bar Night", date: "5 de Agosto, 2025", location: "Club 123, São Paulo - SP" }
-};
+// Mock de eventos para combinar com os ingressos
+const mockEvents = [
+  {
+    id: "1",
+    title: "ALEATÓRIOS FEST",
+    date: "31 de Maio, 2025",
+    location: "Arena Allianz Parque, São Paulo"
+  },
+  {
+    id: "2",
+    title: "PROJETO X: Virada Eletrônica",
+    date: "28 de Maio, 2025",
+    location: "Espaço Unimed, São Paulo"
+  },
+  {
+    id: "3",
+    title: "Neon Night",
+    date: "12 de Junho, 2025",
+    location: "Audio Club, São Paulo"
+  }
+];
 
 const MyTickets: React.FC = () => {
-  const { user } = useAuth();
-  const [tickets, setTickets] = useState<TicketType[]>([]);
+  const [tickets, setTickets] = useState<TicketWithEventType[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const navigate = useNavigate();
   
   useEffect(() => {
     const fetchTickets = async () => {
       if (!user) return;
       
       try {
-        // Now that the tickets table exists in Supabase, this query will work
+        // Buscar ingressos do usuário atual
         const { data, error } = await supabase
           .from('tickets')
           .select('*')
@@ -49,25 +52,24 @@ const MyTickets: React.FC = () => {
         
         if (error) throw error;
         
-        // Process tickets to add event info from our mock data
-        // In a real app, this would be a join query or a separate fetch
-        const processedTickets = data.map((ticket: TicketType) => {
-          const eventInfo = eventsData[ticket.event_id as keyof typeof eventsData] || 
-            { name: "Evento", date: "Data não disponível", location: "Local não disponível" };
+        if (data) {
+          // Combinar os ingressos com os dados simulados de eventos
+          const ticketsWithEventDetails = data.map((ticket: TicketType) => {
+            const event = mockEvents.find(e => e.id === ticket.event_id);
+            return {
+              ...ticket,
+              event_name: event?.title || 'Evento',
+              event_date: event?.date || 'Data não disponível',
+              event_location: event?.location || 'Local não disponível',
+              qr_code: `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${ticket.ticket_number}`
+            };
+          });
           
-          return {
-            ...ticket,
-            event_name: eventInfo.name,
-            event_date: eventInfo.date,
-            event_location: eventInfo.location,
-            qr_code: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${ticket.ticket_number}`
-          };
-        });
-        
-        setTickets(processedTickets);
+          setTickets(ticketsWithEventDetails);
+        }
       } catch (error: any) {
         console.error('Erro ao buscar ingressos:', error);
-        toast.error('Erro ao carregar seus ingressos', {
+        toast.error('Erro ao buscar ingressos', {
           description: error.message
         });
       } finally {
@@ -79,68 +81,101 @@ const MyTickets: React.FC = () => {
   }, [user]);
   
   return (
-    <div className="min-h-screen bg-dark flex flex-col">
+    <div className="min-h-screen bg-dark">
       <Navbar />
       
-      <div className="flex-1 pt-16 pb-16">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="mb-8"
-          >
-            <h1 className="text-3xl md:text-4xl font-bold text-white flex items-center gap-3">
-              <Ticket className="text-neon-blue" />
-              Meus Ingressos
-            </h1>
-            <p className="text-gray-400 mt-2">
-              Todos os seus ingressos adquiridos aparecem aqui
-            </p>
-          </motion.div>
-          
-          {loading ? (
-            <div className="flex justify-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neon-blue"></div>
-            </div>
-          ) : tickets.length > 0 ? (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="space-y-6"
-            >
-              {tickets.map((ticket) => (
-                <TicketCard
-                  key={ticket.id}
-                  id={ticket.ticket_number}
-                  eventName={ticket.event_name || "Evento"}
-                  eventDate={ticket.event_date || "Data não disponível"}
-                  ticketType={ticket.status === 'valid' ? "Ingresso Válido" : "Ingresso Usado"}
-                  price={`R$ ${ticket.price.toFixed(2)}`}
-                  qrCode={ticket.qr_code || ""}
-                  location={ticket.event_location || "Local não disponível"}
-                />
-              ))}
-            </motion.div>
-          ) : (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-16"
-            >
-              <div className="flex justify-center mb-4">
-                <div className="rounded-full bg-gray-800/50 p-6">
-                  <AlertCircle size={40} className="text-gray-400" />
+      <div className="container mx-auto px-4 py-16">
+        <motion.h1 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-4xl font-bold text-white mb-8 text-center"
+        >
+          Meus <span className="neon-text">Ingressos</span>
+        </motion.h1>
+        
+        {loading ? (
+          <div className="flex justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neon-blue"></div>
+          </div>
+        ) : tickets.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {tickets.map((ticket) => (
+              <motion.div
+                key={ticket.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                whileHover={{ scale: 1.02 }}
+                className="glass p-6 rounded-lg"
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <h2 className="text-xl font-bold text-neon-blue">{ticket.event_name}</h2>
+                  <div className={`px-2 py-1 text-xs rounded-full ${
+                    ticket.status === 'valid' 
+                      ? 'bg-green-900/30 text-green-400' 
+                      : 'bg-red-900/30 text-red-400'
+                  }`}>
+                    {ticket.status === 'valid' ? 'Válido' : 'Utilizado'}
+                  </div>
                 </div>
-              </div>
-              <h3 className="text-xl font-medium text-white mb-2">Nenhum ingresso encontrado</h3>
-              <p className="text-gray-400 mb-6">
-                Você ainda não comprou ingressos para nenhum evento
-              </p>
-            </motion.div>
-          )}
-        </div>
+                
+                <div className="mb-4">
+                  <div className="flex items-center gap-2 text-gray-300 mb-2">
+                    <CalendarDays size={16} className="text-neon-purple" />
+                    <span>{ticket.event_date}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-300">
+                    <MapPin size={16} className="text-neon-green" />
+                    <span>{ticket.event_location}</span>
+                  </div>
+                </div>
+                
+                <div className="border-t border-b border-light-gray/30 py-4 mb-4">
+                  <div className="flex justify-center mb-2">
+                    <div className="bg-white p-2 rounded">
+                      <img 
+                        src={ticket.qr_code} 
+                        alt="QR Code do Ingresso" 
+                        className="w-32 h-32"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-center text-sm text-gray-400 mt-2">
+                    Código: {ticket.ticket_number}
+                  </p>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <TicketIcon size={16} className="text-neon-blue" />
+                    <span className="text-gray-300">
+                      Qtd: <span className="text-white">{ticket.quantity}</span>
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-gray-400 text-sm">Valor total</p>
+                    <p className="font-bold text-neon-green">
+                      R$ {(ticket.price * ticket.quantity).toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-16">
+            <TicketIcon className="mx-auto h-16 w-16 text-gray-500 mb-4" />
+            <h2 className="text-2xl font-semibold text-white mb-2">Você ainda não tem ingressos</h2>
+            <p className="text-gray-400 max-w-md mx-auto mb-6">
+              Compre ingressos para os próximos eventos e eles aparecerão aqui
+            </p>
+            <Button 
+              className="bg-neon-blue text-black hover:bg-neon-blue/80"
+              onClick={() => navigate('/')}
+            >
+              Ver Eventos
+            </Button>
+          </div>
+        )}
       </div>
       
       <Footer />
