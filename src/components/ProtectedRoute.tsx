@@ -13,25 +13,25 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
   requireAdmin = false
 }) => {
-  const { user, isLoading } = useAuth();
+  const { user, session, loading } = useAuth(); // Changed isLoading to loading to match AuthContext
   const location = useLocation();
 
   useEffect(() => {
-    if (!isLoading && !user) {
+    if (!loading && !user) {
       // Salvar a rota atual para redirecionar depois do login
       localStorage.setItem('redirectAfterLogin', location.pathname);
       toast.error('Acesso negado', {
         description: 'Faça login para acessar esta página'
       });
-    } else if (!isLoading && requireAdmin && user?.role !== 'admin') {
+    } else if (!loading && requireAdmin && user?.role !== 'admin') {
       toast.error('Acesso negado', {
         description: 'Você não tem permissão para acessar esta página'
       });
     }
-  }, [user, isLoading, location.pathname, requireAdmin]);
+  }, [user, loading, location.pathname, requireAdmin]);
 
   // Mostrar um indicador de carregamento enquanto verifica a autenticação
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-dark flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neon-blue"></div>

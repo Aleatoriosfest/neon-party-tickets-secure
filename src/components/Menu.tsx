@@ -1,10 +1,12 @@
 
-import { LucideIcon } from 'lucide-react';
+import React, { forwardRef } from 'react';
+import { LucideProps } from 'lucide-react';
 
 // Este componente é uma substituição para o ícone Menu do lucide-react
-const Menu: LucideIcon = (props) => {
+const Menu = forwardRef<SVGSVGElement, LucideProps>((props, ref) => {
   return (
     <svg
+      ref={ref}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"
@@ -21,6 +23,8 @@ const Menu: LucideIcon = (props) => {
       <line x1="4" x2="20" y1="18" y2="18" />
     </svg>
   );
-};
+});
+
+Menu.displayName = "Menu";
 
 export default Menu;

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
@@ -42,8 +41,7 @@ const MyTickets: React.FC = () => {
       if (!user) return;
       
       try {
-        // Fetch tickets from Supabase
-        // Importante: Esta chamada não funcionará até que tenhamos a tabela tickets criada no Supabase
+        // Now that the tickets table exists in Supabase, this query will work
         const { data, error } = await supabase
           .from('tickets')
           .select('*')
@@ -53,7 +51,7 @@ const MyTickets: React.FC = () => {
         
         // Process tickets to add event info from our mock data
         // In a real app, this would be a join query or a separate fetch
-        const processedTickets = data.map((ticket: any) => {
+        const processedTickets = data.map((ticket: TicketType) => {
           const eventInfo = eventsData[ticket.event_id as keyof typeof eventsData] || 
             { name: "Evento", date: "Data não disponível", location: "Local não disponível" };
           

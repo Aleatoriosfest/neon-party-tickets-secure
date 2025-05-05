@@ -1,10 +1,12 @@
 
-import { LucideIcon } from 'lucide-react';
+import React, { forwardRef } from 'react';
+import { LucideProps } from 'lucide-react';
 
 // Este componente é uma substituição para o ícone X do lucide-react
-const X: LucideIcon = (props) => {
+const X = forwardRef<SVGSVGElement, LucideProps>((props, ref) => {
   return (
     <svg
+      ref={ref}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"
@@ -20,6 +22,8 @@ const X: LucideIcon = (props) => {
       <path d="m6 6 12 12" />
     </svg>
   );
-};
+});
+
+X.displayName = "X";
 
 export default X;
