@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import AdminRoute from "@/components/AdminRoute";
 
 // Pages
 import Home from "./pages/Home";
@@ -57,14 +58,19 @@ const App = () => {
                     </ProtectedRoute>
                   } />
                   <Route path="/admin" element={
-                    <ProtectedRoute requireAdmin>
+                    <AdminRoute>
                       <Admin />
-                    </ProtectedRoute>
+                    </AdminRoute>
                   } />
                   <Route path="/admin/dashboard" element={
-                    <ProtectedRoute requireAdmin>
+                    <AdminRoute>
                       <AdminDashboard />
-                    </ProtectedRoute>
+                    </AdminRoute>
+                  } />
+                  <Route path="/admin/verificador" element={
+                    <AdminRoute>
+                      <AdminDashboard />
+                    </AdminRoute>
                   } />
                   <Route path="/access-denied" element={<AccessDenied />} />
                   <Route path="/payment-success" element={<Home />} />
@@ -72,7 +78,6 @@ const App = () => {
                   <Route path="/politica-privacidade" element={<Home />} />
                   <Route path="/termos-uso" element={<Home />} />
                   <Route path="/sobre" element={<Home />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 <Toaster />
