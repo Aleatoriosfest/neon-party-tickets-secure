@@ -29,7 +29,7 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -38,42 +38,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     // Set up auth state listener first to prevent race conditions
     const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, sessionData) => {
+      async (event, sessionData) => {
         // Use synchronous updates first
         setSession(sessionData);
         
         if (event === 'SIGNED_IN' && sessionData) {
-          // Defer Supabase calls with setTimeout to prevent deadlocks
-          setTimeout(async () => {
-            try {
-              // Get user profile data after sign in
-              const { data: userData, error: profileError } = await supabase
-                .from('usuarios')
-                .select('*')
-                .eq('id', sessionData.user.id)
-                .single();
-                
-              if (!profileError && userData) {
-                setUser({
-                  id: sessionData.user.id,
-                  email: sessionData.user.email || '',
-                  name: userData.name,
-                  role: userData.role as 'admin' | 'user',
-                });
-                
-                // Redirect based on role
-                if (userData.role === 'admin') {
-                  navigate('/admin/dashboard');
-                } else {
-                  navigate('/minha-conta');
-                }
+          try {
+            // Get user profile data after sign in
+            const { data: userData, error: profileError } = await supabase
+              .from('usuarios')
+              .select('*')
+              .eq('id', sessionData.user.id)
+              .single();
+              
+            if (!profileError && userData) {
+              setUser({
+                id: sessionData.user.id,
+                email: sessionData.user.email || '',
+                name: userData.name,
+                role: userData.role as 'admin' | 'user',
+              });
+              
+              // Redirect based on role
+              if (userData.role === 'admin') {
+                navigate('/admin/dashboard');
+              } else {
+                navigate('/minha-conta');
               }
-            } catch (error) {
-              console.error('Error fetching user profile:', error);
-            } finally {
-              setLoading(false);
             }
-          }, 0);
+          } catch (error) {
+            console.error('Error fetching user profile:', error);
+          } finally {
+            setLoading(false);
+          }
         } else if (event === 'SIGNED_OUT') {
           setUser(null);
           navigate('/');

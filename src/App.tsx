@@ -19,70 +19,70 @@ import AccessDenied from "./pages/AccessDenied";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import AdminDashboard from "./pages/AdminDashboard";
+import PurchaseConfirmation from "./pages/PurchaseConfirmation";
 
 // Create a new QueryClient instance
 const queryClient = new QueryClient();
 
 const App = () => {
   return (
-    <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <AuthProvider>
-            <TooltipProvider>
-              <MotionConfig reducedMotion="user">
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/eventos" element={<Home />} />
-                  <Route path="/eventos/:id" element={<EventDetail />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/meus-ingressos" element={
-                    <ProtectedRoute>
-                      <MyTickets />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/minha-conta" element={
-                    <ProtectedRoute>
-                      <UserAccount />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/minha-conta/email" element={
-                    <ProtectedRoute>
-                      <UserAccount />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/minha-conta/senha" element={
-                    <ProtectedRoute>
-                      <UserAccount />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/admin" element={
-                    <ProtectedRoute requireAdmin>
-                      <Admin />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/admin/dashboard" element={
-                    <ProtectedRoute requireAdmin>
-                      <AdminDashboard />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/access-denied" element={<AccessDenied />} />
-                  <Route path="/payment-success" element={<Home />} />
-                  <Route path="/payment-canceled" element={<Home />} />
-                  <Route path="/politica-privacidade" element={<Home />} />
-                  <Route path="/termos-uso" element={<Home />} />
-                  <Route path="/sobre" element={<Home />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-                <Toaster />
-                <Sonner />
-              </MotionConfig>
-            </TooltipProvider>
-          </AuthProvider>
-        </BrowserRouter>
-      </QueryClientProvider>
-    </React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <TooltipProvider>
+          <MotionConfig reducedMotion="user">
+            <AuthProvider>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/eventos" element={<Home />} />
+                <Route path="/eventos/:id" element={<EventDetail />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/meus-ingressos" element={
+                  <ProtectedRoute>
+                    <MyTickets />
+                  </ProtectedRoute>
+                } />
+                <Route path="/minha-conta" element={
+                  <ProtectedRoute>
+                    <UserAccount />
+                  </ProtectedRoute>
+                } />
+                <Route path="/minha-conta/email" element={
+                  <ProtectedRoute>
+                    <UserAccount />
+                  </ProtectedRoute>
+                } />
+                <Route path="/minha-conta/senha" element={
+                  <ProtectedRoute>
+                    <UserAccount />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin" element={
+                  <ProtectedRoute requireAdmin>
+                    <Admin />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/dashboard" element={
+                  <ProtectedRoute requireAdmin>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/access-denied" element={<AccessDenied />} />
+                <Route path="/payment-success" element={<Home />} />
+                <Route path="/payment-canceled" element={<Home />} />
+                <Route path="/purchase-confirmation" element={<PurchaseConfirmation />} />
+                <Route path="/politica-privacidade" element={<Home />} />
+                <Route path="/termos-uso" element={<Home />} />
+                <Route path="/sobre" element={<Home />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+              <Toaster />
+              <Sonner />
+            </AuthProvider>
+          </MotionConfig>
+        </TooltipProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 };
 
