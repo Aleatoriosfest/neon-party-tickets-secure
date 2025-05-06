@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -86,7 +87,7 @@ const EventDetail: React.FC = () => {
         </Button>
       </div>
       
-      {/* Static Flyer Banner */}
+      {/* Static Flyer Banner - No carousel, just a static image as requested */}
       <section className="pb-8">
         <div className="relative w-full h-[50vh] md:h-[70vh] overflow-hidden rounded-lg">
           <div className="relative w-full h-full">
