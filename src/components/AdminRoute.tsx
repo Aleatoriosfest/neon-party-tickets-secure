@@ -25,6 +25,8 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
     toast.error('Acesso negado', {
       description: 'Faça login para acessar esta página'
     });
+    // Save the current path for redirect after login
+    localStorage.setItem('redirectAfterLogin', '/admin');
     return <Navigate to="/auth" replace />;
   }
   

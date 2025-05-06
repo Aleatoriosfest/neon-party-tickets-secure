@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase, User } from '@/lib/supabase';
 import { toast } from '@/components/ui/sonner';
 import { Session } from '@supabase/supabase-js';
@@ -34,6 +34,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     // Set up auth state listener first to prevent race conditions
@@ -61,11 +62,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                   role: userData.role as 'admin' | 'user',
                 });
                 
-                // Redirect based on role
-                if (userData.role === 'admin') {
-                  navigate('/admin/dashboard');
+                // Get the redirect path from localStorage or use default path
+                const redirectPath = localStorage.getItem('redirectAfterLogin');
+                if (redirectPath) {
+                  // Clear the stored path
+                  localStorage.removeItem('redirectAfterLogin');
+                  navigate(redirectPath);
                 } else {
-                  navigate('/minha-conta');
+                  // Redirect based on role
+                  if (userData.role === 'admin') {
+                    navigate('/admin/dashboard');
+                  } else {
+                    navigate('/minha-conta');
+                  }
                 }
               }
             } catch (error) {
@@ -121,6 +130,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     };
   }, [navigate]);
+
+  // Add effect to store current path when not on auth page
+  useEffect(() => {
+    if (!loading && !user && location.pathname !== '/auth') {
+      localStorage.setItem('redirectAfterLogin', location.pathname);
+    }
+  }, [location.pathname, loading, user]);
 
   const signIn = async (email: string, password: string) => {
     try {
