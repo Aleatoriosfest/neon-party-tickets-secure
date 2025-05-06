@@ -18,25 +18,6 @@ const Home: React.FC = () => {
     price: "R$50,00",
     category: "Festa"
   };
-  
-  // Placeholder upcoming events (just visual placeholders)
-  const upcomingEvents = [
-    {
-      id: "placeholder-1",
-      image: "/lovable-uploads/f47b2c1d-b605-469f-a0e1-ea3d73c3ef25.png",
-      date: "15 de Agosto, 2025"
-    },
-    {
-      id: "placeholder-2",
-      image: "/lovable-uploads/42202d9f-6a6a-4541-b446-225cbc122a53.png",
-      date: "10 de Setembro, 2025"
-    },
-    {
-      id: "placeholder-3",
-      image: "/lovable-uploads/7167fe07-a100-48a7-9d4e-ef3e91237dd1.png",
-      date: "25 de Outubro, 2025"
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-dark">
@@ -63,14 +44,14 @@ const Home: React.FC = () => {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.2 }}
-              className="text-gray-300 text-lg mb-6"
+              className="text-lg mb-6 text-gray-300"
             >
               Descubra os melhores eventos e festas da cidade. Compre seus ingressos e viva experiências inesquecíveis.
             </motion.p>
           </div>
         </motion.div>
         
-        {/* Event Catalog */}
+        {/* Event Catalog - Only Projeto X */}
         <section className="container mx-auto px-4 py-12">
           <motion.h1 
             initial={{ opacity: 0, y: -20 }}
@@ -128,7 +109,7 @@ const Home: React.FC = () => {
           </div>
         </section>
         
-        {/* Upcoming Events Section */}
+        {/* Upcoming Events Section - Black image with "Em breve" text */}
         <section className="container mx-auto px-4 py-12">
           <motion.h2 
             initial={{ opacity: 0, y: -20 }}
@@ -140,25 +121,17 @@ const Home: React.FC = () => {
           </motion.h2>
           
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {upcomingEvents.map((event, index) => (
-              <motion.div
-                key={event.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="group relative h-40 sm:h-64 overflow-hidden rounded-lg cursor-pointer"
-              >
-                <div 
-                  className="absolute inset-0 bg-cover bg-center transition-transform group-hover:scale-110 duration-500"
-                  style={{ backgroundImage: `url(${event.image})` }}
-                ></div>
-                <div className="absolute inset-0 bg-gradient-to-t from-dark to-transparent"></div>
-                <div className="absolute bottom-0 left-0 p-4">
-                  <p className="text-white font-medium">{event.date}</p>
-                  <p className="text-gray-300 text-sm mt-1">Em breve</p>
-                </div>
-              </motion.div>
-            ))}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="group relative h-40 sm:h-64 overflow-hidden rounded-lg"
+            >
+              <div className="absolute inset-0 bg-black"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <p className="text-white font-medium text-xl">Em breve</p>
+              </div>
+            </motion.div>
           </div>
         </section>
       </div>

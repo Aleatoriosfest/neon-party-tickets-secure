@@ -22,6 +22,7 @@ const projectXEvent: EventType = {
   price: 50,
   image_url: "/lovable-uploads/de50cc19-19d3-44a1-bf48-7a14dcc3a803.png",
   ticketsAvailable: true,
+  images: [],
   attractions: [
     {
       name: "DJ Arthur ZL",
@@ -41,7 +42,6 @@ const projectXEvent: EventType = {
 const EventDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [event, setEvent] = useState<EventType | null>(null);
-  const [activeSlide, setActiveSlide] = useState(0);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -61,11 +61,6 @@ const EventDetail: React.FC = () => {
     }
     
     setShowPurchaseModal(true);
-  };
-  
-  // Function to handle slide change (not used with static flyer)
-  const handleSlideChange = (index: number) => {
-    setActiveSlide(index);
   };
   
   if (!event) {

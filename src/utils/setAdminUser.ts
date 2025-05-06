@@ -7,7 +7,7 @@ export async function setAdminUser(email: string) {
     // First we need to find the user by email
     const { data: users, error: userError } = await supabase
       .from('usuarios')
-      .select('id, email')
+      .select('id')
       .eq('email', email);
     
     if (userError) {

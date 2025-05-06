@@ -10,6 +10,13 @@ export interface TicketType {
   quantity: number;
 }
 
+export interface Attraction {
+  name: string;
+  role: string;
+  image: string;
+  description: string;
+}
+
 export interface EventType {
   id: string;
   title: string;
@@ -21,7 +28,7 @@ export interface EventType {
   subtitle?: string;
   time?: string;
   images?: string[];
-  attractions?: any[];
+  attractions?: Attraction[];
   ticketsAvailable?: boolean;
 }
 
