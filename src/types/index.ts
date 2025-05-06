@@ -18,6 +18,11 @@ export interface EventType {
   location: string;
   price: number;
   image_url: string;
+  subtitle?: string;
+  time?: string;
+  images?: string[];
+  attractions?: any[];
+  ticketsAvailable?: boolean;
 }
 
 export interface TicketWithEventType extends TicketType {

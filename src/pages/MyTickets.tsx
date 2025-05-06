@@ -4,32 +4,28 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { motion } from 'framer-motion';
-import { TicketIcon, CalendarDays, MapPin, User } from 'lucide-react';
+import { TicketIcon, CalendarDays, MapPin } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from '@/components/ui/sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { TicketType, TicketWithEventType } from '@/types';
 
-// Mock de eventos para combinar com os ingressos
-const mockEvents = [
+// Mock data for testing tickets
+const mockTickets: TicketWithEventType[] = [
   {
     id: "1",
-    title: "ALEATÓRIOS FEST",
-    date: "31 de Maio, 2025",
-    location: "Arena Allianz Parque, São Paulo"
-  },
-  {
-    id: "2",
-    title: "PROJETO X: Virada Eletrônica",
-    date: "28 de Maio, 2025",
-    location: "Espaço Unimed, São Paulo"
-  },
-  {
-    id: "3",
-    title: "Neon Night",
-    date: "12 de Junho, 2025",
-    location: "Audio Club, São Paulo"
+    user_id: "user123",
+    event_id: "1",
+    ticket_number: "PX-2025-001",
+    status: "valid",
+    purchase_date: "2025-05-01T12:00:00Z",
+    price: 50,
+    quantity: 1,
+    event_name: "PROJETO X",
+    event_date: "20 de Julho, 2025",
+    event_location: "Arena XYZ, São Paulo - SP",
+    qr_code: `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=PX-2025-001`
   }
 ];
 
@@ -40,33 +36,16 @@ const MyTickets: React.FC = () => {
   const navigate = useNavigate();
   
   useEffect(() => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+    
     const fetchTickets = async () => {
-      if (!user) return;
-      
       try {
-        // Buscar ingressos do usuário atual
-        const { data, error } = await supabase
-          .from('tickets')
-          .select('*')
-          .eq('user_id', user.id);
-        
-        if (error) throw error;
-        
-        if (data) {
-          // Combinar os ingressos com os dados simulados de eventos
-          const ticketsWithEventDetails = data.map((ticket: TicketType) => {
-            const event = mockEvents.find(e => e.id === ticket.event_id);
-            return {
-              ...ticket,
-              event_name: event?.title || 'Evento',
-              event_date: event?.date || 'Data não disponível',
-              event_location: event?.location || 'Local não disponível',
-              qr_code: `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${ticket.ticket_number}`
-            };
-          });
-          
-          setTickets(ticketsWithEventDetails);
-        }
+        // For now, use mock data
+        // In a real app, we would fetch from Supabase
+        setTickets(mockTickets);
       } catch (error: any) {
         console.error('Erro ao buscar ingressos:', error);
         toast.error('Erro ao buscar ingressos', {
@@ -78,7 +57,7 @@ const MyTickets: React.FC = () => {
     };
     
     fetchTickets();
-  }, [user]);
+  }, [user, navigate]);
   
   return (
     <div className="min-h-screen bg-dark">
@@ -148,13 +127,13 @@ const MyTickets: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <TicketIcon size={16} className="text-neon-blue" />
                     <span className="text-gray-300">
-                      Qtd: <span className="text-white">{ticket.quantity}</span>
+                      Tipo: <span className="text-white">Ingresso padrão</span>
                     </span>
                   </div>
                   <div className="text-right">
-                    <p className="text-gray-400 text-sm">Valor total</p>
+                    <p className="text-gray-400 text-sm">Valor</p>
                     <p className="font-bold text-neon-green">
-                      R$ {(ticket.price * ticket.quantity).toFixed(2)}
+                      R$ {ticket.price.toFixed(2)}
                     </p>
                   </div>
                 </div>
