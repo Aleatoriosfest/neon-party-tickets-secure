@@ -14,6 +14,11 @@ export const setUserAsAdmin = async (email: string) => {
       throw new Error(`Error fetching users: ${userError.message}`);
     }
     
+    // Check if userData and userData.users are defined
+    if (!userData || !userData.users || !Array.isArray(userData.users)) {
+      throw new Error('No user data returned or invalid format');
+    }
+    
     const user = userData.users.find(u => u.email === email);
     
     if (!user) {
