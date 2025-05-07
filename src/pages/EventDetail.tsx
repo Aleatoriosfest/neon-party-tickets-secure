@@ -10,21 +10,48 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ArrowLeft, Calendar, MapPin } from 'lucide-react';
 import { EventType } from '@/types';
 import PurchaseTicketModal from '@/components/PurchaseTicketModal';
+import CountdownTimer from '@/components/CountdownTimer';
+import ArtistTimeline from '@/components/ArtistTimeline';
+import PhotoGallery from '@/components/PhotoGallery';
 
-// Mock data for the Projeto X event
+// Restaurando todos os detalhes originais do evento Projeto X
 const projectXEvent: EventType = {
   id: "1",
   title: "PROJETO X",
   subtitle: "A festa mais louca do ano",
   description: "Uma experiência única com os melhores DJs e atrações da cidade!",
-  date: "20 de Julho, 2025",
-  time: "22:00 às 04:00",
-  location: "Arena XYZ, São Paulo - SP",
-  price: 50,
+  date: "31 de Maio, 2025",
+  time: "16:00 às 00:00",
+  location: "Chácara Monero, Osasco - SP",
+  price: 30,
   image_url: "/lovable-uploads/de50cc19-19d3-44a1-bf48-7a14dcc3a803.png",
   ticketsAvailable: true,
   images: [],
   attractions: [
+    {
+      name: "DJ Buzato",
+      role: "DJ",
+      image: "/lovable-uploads/9261fd76-402b-4aee-b73b-fcaf4f396c03.png",
+      description: "Atração Confirmada"
+    },
+    {
+      name: "Tio Reh",
+      role: "O Brabo do Passinho",
+      image: "/lovable-uploads/0fa98cf1-cff5-49fd-8709-5417fc6838a9.png",
+      description: "Atração Confirmada"
+    },
+    {
+      name: "DJ EZ Da Z/O",
+      role: "O Mago",
+      image: "/lovable-uploads/9bb4eefd-69a5-4c24-8703-d7d7827455fb.png",
+      description: "Atração Confirmada" 
+    },
+    {
+      name: "DJ Luís ZL",
+      role: "DJ",
+      image: "/lovable-uploads/f4ab4706-3eb6-4041-bef7-5b41bf79ede2.png",
+      description: "Atração Confirmada"
+    },
     {
       name: "DJ Arthur ZL",
       role: "Tá Tocando pras Gustosa",
@@ -36,6 +63,12 @@ const projectXEvent: EventType = {
       role: "Trem Bala",
       image: "/lovable-uploads/cc64f665-9293-4b72-b9ec-0e086767e5d8.png",
       description: "Da Putaria" 
+    },
+    {
+      name: "Tequileira Branquinha",
+      role: "Show",
+      image: "/lovable-uploads/66e7124c-142d-48aa-804a-bc0dd6b9cb6b.png",
+      description: "Atração Confirmada"
     }
   ]
 };
@@ -48,13 +81,20 @@ const EventDetail: React.FC = () => {
   const { user } = useAuth();
   
   useEffect(() => {
-    // For now, we'll always load the Projeto X event
+    // Para agora, vamos sempre carregar o evento Projeto X
     setEvent(projectXEvent);
   }, [id]);
   
+  useEffect(() => {
+    // Chamar a função setupAdmin no carregamento da página
+    import('@/utils/adminSetup').then(module => {
+      module.setupAdmin();
+    });
+  }, []);
+  
   const handleBuyTicket = () => {
     if (!user) {
-      // Store the intended destination
+      // Armazenar o destino pretendido
       localStorage.setItem('redirectAfterLogin', `/eventos/${id}`);
       toast.info('Faça login para comprar ingressos');
       navigate('/auth');
@@ -87,7 +127,7 @@ const EventDetail: React.FC = () => {
         </Button>
       </div>
       
-      {/* Static Flyer Banner - No carousel, just a static image as requested */}
+      {/* Flyer estático - sem carrossel, apenas a imagem original como solicitado */}
       <section className="pb-8">
         <div className="relative w-full h-[50vh] md:h-[70vh] overflow-hidden rounded-lg">
           <div className="relative w-full h-full">
@@ -144,7 +184,10 @@ const EventDetail: React.FC = () => {
         </div>
       </section>
       
-      {/* Event Details - Keep the existing content */}
+      {/* Contagem regressiva */}
+      <CountdownTimer targetDate="2025-05-31T16:00:00" />
+      
+      {/* Event Details */}
       <div className="container mx-auto px-4 py-8">
         <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">Detalhes do Evento</h2>
         <p className="text-gray-300 mb-6">{event.description}</p>
@@ -166,11 +209,22 @@ const EventDetail: React.FC = () => {
             </li>
             <li className="flex items-center">
               <span className="text-neon-blue mr-2">•</span>
-              <span>Valor: R${event.price.toFixed(2)}</span>
+              <span>Mulher: R$20,00 (ingresso antecipado)</span>
+            </li>
+            <li className="flex items-center">
+              <span className="text-neon-blue mr-2">•</span>
+              <span>Homem: R$30,00 (ingresso antecipado)</span>
+            </li>
+            <li className="flex items-center">
+              <span className="text-neon-blue mr-2">•</span>
+              <span>Na porta: R$50,00 (para todos)</span>
             </li>
           </ul>
         </div>
       </div>
+      
+      {/* Cronograma de artistas */}
+      <ArtistTimeline />
       
       {/* Attractions Section */}
       {event.attractions && event.attractions.length > 0 && (
@@ -190,6 +244,22 @@ const EventDetail: React.FC = () => {
           </div>
         </section>
       )}
+      
+      {/* Fotos do local */}
+      <section className="container mx-auto px-4 py-8">
+        <PhotoGallery 
+          photos={[
+            "/lovable-uploads/9b5040f4-3d9b-431b-9528-0a6e0552d820.png",
+            "/lovable-uploads/1f4c116a-2467-4107-97a1-4b397d9ca8dd.png",
+            "/lovable-uploads/27f85bf7-0910-4968-8bbd-70116f2445b4.png",
+            "/lovable-uploads/fdb76549-81d9-4887-ac8f-2601d25c76ff.png",
+            "/lovable-uploads/870304d1-530e-4ea0-87f8-4289cf656d78.png",
+            "/lovable-uploads/31f8a26d-bdbb-4ba8-8e99-6774edc2d5be.png",
+            "/lovable-uploads/4bf3e74e-28e6-4abe-a119-ab22358af8bf.png"
+          ]}
+          title="Fotos do Local" 
+        />
+      </section>
       
       {/* Buy Tickets Section */}
       <section className="container mx-auto px-4 py-12">

@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MotionConfig } from "framer-motion";
@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { setupAdmin } from "@/utils/adminSetup";
 
 // Pages
 import Home from "./pages/Home";
@@ -25,6 +26,11 @@ import PurchaseConfirmation from "./pages/PurchaseConfirmation";
 const queryClient = new QueryClient();
 
 const App = () => {
+  useEffect(() => {
+    // Chamar a função setupAdmin quando o aplicativo é carregado
+    setupAdmin();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
