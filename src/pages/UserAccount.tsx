@@ -8,25 +8,29 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import { toast } from '@/components/ui/sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, Mail, Key, LogOut, Ticket, AlertCircle } from 'lucide-react';
+import { User, Mail, Key, LogOut, Ticket, AlertCircle, QrCode } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
+import UserTicketCard from '@/components/UserTicketCard';
 
 const UserAccount: React.FC = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [name, setName] = useState(user?.name || '');
+  const [nickname, setNickname] = useState('');
   const [email, setEmail] = useState(user?.email || '');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [tickets, setTickets] = useState<any[]>([]);
+  const [selectedTicket, setSelectedTicket] = useState<any>(null);
+  const [showTicketModal, setShowTicketModal] = useState(false);
   
   useEffect(() => {
     if (!user) {
@@ -34,8 +38,30 @@ const UserAccount: React.FC = () => {
     } else {
       setName(user.name || '');
       setEmail(user.email || '');
+      setNickname(user.name || ''); // Initialize nickname with name
+      
+      // Fetch user tickets
+      fetchUserTickets();
     }
   }, [user, navigate]);
+  
+  const fetchUserTickets = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('tickets')
+        .select('*')
+        .eq('user_id', user.id);
+        
+      if (error) throw error;
+      
+      setTickets(data || []);
+    } catch (error: any) {
+      console.error('Error fetching tickets:', error);
+      toast.error('Erro ao carregar ingressos');
+    }
+  };
   
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,16 +74,13 @@ const UserAccount: React.FC = () => {
       const { error } = await supabase
         .from('usuarios')
         .update({
-          name: name
+          name: nickname // Update with the nickname
         })
         .eq('id', user.id);
         
       if (error) throw error;
       
       toast.success('Perfil atualizado com sucesso!');
-      
-      // Atualize o contexto do usuário se necessário
-      // updateUserContext({ ...user, name });
       
     } catch (error: any) {
       console.error('Erro ao atualizar perfil:', error);
@@ -101,27 +124,9 @@ const UserAccount: React.FC = () => {
     }
   };
   
-  const handleDeleteAccount = async () => {
-    if (!user) return;
-    
-    setLoading(true);
-    
-    try {
-      // Em uma implementação real, isto deve ser feito via uma função segura no backend
-      // Este é apenas um exemplo simulado
-      toast.success('Conta excluída com sucesso');
-      await signOut();
-      navigate('/');
-      
-    } catch (error: any) {
-      console.error('Erro ao excluir conta:', error);
-      toast.error('Erro ao excluir sua conta', { 
-        description: error.message 
-      });
-    } finally {
-      setLoading(false);
-      setShowDeleteDialog(false);
-    }
+  const handleViewTicket = (ticket: any) => {
+    setSelectedTicket(ticket);
+    setShowTicketModal(true);
   };
   
   const handleLogout = async () => {
@@ -135,6 +140,22 @@ const UserAccount: React.FC = () => {
       });
     }
   };
+  
+  // Mock tickets for display if no real tickets exist
+  const mockTickets = [
+    {
+      id: '1',
+      ticket_number: 'ALT-2023-001',
+      event_id: '1',
+      status: 'ativo',
+      price: 30,
+      purchase_date: new Date().toISOString(),
+      quantity: 1
+    }
+  ];
+  
+  // Use real tickets if available, otherwise use mock data
+  const displayTickets = tickets.length > 0 ? tickets : mockTickets;
   
   if (!user) {
     return null;
@@ -157,7 +178,7 @@ const UserAccount: React.FC = () => {
               Minha Conta
             </h1>
             <p className="text-gray-400 mt-2">
-              Gerencie seus dados pessoais e preferências
+              Gerencie seus dados pessoais e ingressos
             </p>
           </motion.div>
           
@@ -168,11 +189,11 @@ const UserAccount: React.FC = () => {
                 <div className="flex items-center gap-4">
                   <Avatar className="h-16 w-16 bg-neon-blue/20 border border-neon-blue/30">
                     <AvatarFallback className="text-neon-blue text-xl">
-                      {name ? name.charAt(0).toUpperCase() : 'U'}
+                      {nickname ? nickname.charAt(0).toUpperCase() : 'U'}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <CardTitle className="text-xl">{name || 'Usuário'}</CardTitle>
+                    <CardTitle className="text-xl">{nickname || 'Usuário'}</CardTitle>
                     <p className="text-gray-400">{email}</p>
                     <p className="text-xs text-gray-500 mt-1">
                       Membro desde {new Date(user.created_at || Date.now()).toLocaleDateString('pt-BR')}
@@ -182,10 +203,9 @@ const UserAccount: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-3 mt-4">
-                  <Link to="/meus-ingressos">
+                  <Link to="/eventos">
                     <Button variant="outline" className="border-neon-blue text-neon-blue hover:bg-neon-blue/20">
-                      <Ticket className="w-4 h-4 mr-2" />
-                      Meus Ingressos
+                      Voltar para Eventos
                     </Button>
                   </Link>
                   <Button 
@@ -208,6 +228,10 @@ const UserAccount: React.FC = () => {
                 <User className="w-4 h-4 mr-2" />
                 Perfil
               </TabsTrigger>
+              <TabsTrigger value="tickets" className="text-white data-[state=active]:bg-neon-purple/20 data-[state=active]:text-neon-purple">
+                <Ticket className="w-4 h-4 mr-2" />
+                Meus Ingressos
+              </TabsTrigger>
               <TabsTrigger value="security" className="text-white data-[state=active]:bg-neon-purple/20 data-[state=active]:text-neon-purple">
                 <Key className="w-4 h-4 mr-2" />
                 Segurança
@@ -219,20 +243,22 @@ const UserAccount: React.FC = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <User className="text-neon-blue w-5 h-5" />
-                    Informações do Perfil
+                    Editar Perfil
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleUpdateProfile} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="name">Nome completo</Label>
+                      <Label htmlFor="nickname">Nickname</Label>
                       <Input
-                        id="name"
+                        id="nickname"
                         type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        value={nickname}
+                        onChange={(e) => setNickname(e.target.value)}
+                        placeholder="Como deseja ser chamado"
                         className="bg-gray-800 border-gray-700 text-white"
                       />
+                      <p className="text-xs text-gray-500">Este é o nome que será exibido em sua conta</p>
                     </div>
                     
                     <div className="space-y-2">
@@ -257,6 +283,57 @@ const UserAccount: React.FC = () => {
                       </Button>
                     </div>
                   </form>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="tickets">
+              <Card className="bg-dark-gray border-light-gray text-white">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Ticket className="text-neon-blue w-5 h-5" />
+                    Meus Ingressos
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {displayTickets.length > 0 ? (
+                    <div className="space-y-6">
+                      {displayTickets.map((ticket) => (
+                        <div key={ticket.id} className="border border-light-gray/30 rounded-lg p-4">
+                          <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+                            <div className="mb-4 md:mb-0">
+                              <h3 className="font-bold text-lg">ALEATÓRIOS FEST</h3>
+                              <p className="text-gray-400 text-sm">Ingresso #{ticket.ticket_number}</p>
+                              <p className="text-gray-400 text-sm">
+                                Comprado em: {new Date(ticket.purchase_date).toLocaleDateString('pt-BR')}
+                              </p>
+                              <div className="mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-900/30 text-green-400">
+                                {ticket.status === 'ativo' ? 'Ativo' : 'Usado'}
+                              </div>
+                            </div>
+                            
+                            <Button 
+                              className="bg-neon-purple hover:bg-neon-purple/80 text-white"
+                              onClick={() => handleViewTicket(ticket)}
+                            >
+                              <QrCode className="w-4 h-4 mr-2" />
+                              Visualizar Ingresso
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-gray-400">Você ainda não tem ingressos</p>
+                      <Button 
+                        className="mt-4 bg-neon-blue hover:bg-neon-blue/80 text-black"
+                        onClick={() => navigate('/eventos')}
+                      >
+                        Ver Eventos Disponíveis
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -316,71 +393,44 @@ const UserAccount: React.FC = () => {
                   </form>
                 </CardContent>
               </Card>
-              
-              <div className="mt-8">
-                <Card className="bg-dark-gray/50 border-red-500/30 text-white">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-red-500">
-                      <AlertCircle className="w-5 h-5" />
-                      Zona de perigo
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-400 mb-4">
-                      Excluir sua conta é uma ação permanente e não pode ser desfeita. 
-                      Todos os seus dados e ingressos serão permanentemente apagados.
-                    </p>
-                    <Button 
-                      variant="destructive" 
-                      className="bg-red-500/80 hover:bg-red-500 text-white"
-                      onClick={() => setShowDeleteDialog(true)}
-                    >
-                      Excluir minha conta
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
             </TabsContent>
           </Tabs>
-          
-          {/* Modal de confirmação para excluir conta */}
-          <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-            <DialogContent className="bg-dark-gray border-light-gray text-white">
-              <DialogHeader>
-                <DialogTitle className="text-red-500">Excluir conta</DialogTitle>
-                <DialogDescription className="text-gray-400">
-                  Esta ação não pode ser desfeita. Isso excluirá permanentemente sua conta e todos os dados associados.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="py-4">
-                <p className="text-white">
-                  Digite <strong>excluir</strong> para confirmar:
-                </p>
-                <Input 
-                  className="mt-2 bg-gray-800 border-gray-700 text-white"
-                  placeholder="excluir"
-                />
-              </div>
-              <DialogFooter>
-                <Button 
-                  variant="outline" 
-                  onClick={() => setShowDeleteDialog(false)}
-                  className="border-gray-600 text-gray-300"
-                >
-                  Cancelar
-                </Button>
-                <Button 
-                  variant="destructive" 
-                  onClick={handleDeleteAccount}
-                  disabled={loading}
-                >
-                  {loading ? 'Excluindo...' : 'Confirmar exclusão'}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
         </div>
       </div>
+      
+      {/* Ticket QR Code Modal */}
+      <Dialog open={showTicketModal} onOpenChange={setShowTicketModal}>
+        <DialogContent className="bg-dark-gray border-light-gray text-white">
+          <DialogHeader>
+            <DialogTitle className="text-neon-blue">Seu Ingresso</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 flex flex-col items-center">
+            <div className="bg-white p-4 rounded-lg mb-4">
+              {/* Placeholder for QR Code image */}
+              <div className="w-48 h-48 bg-black flex items-center justify-center text-white">
+                QR Code de {selectedTicket?.ticket_number}
+              </div>
+            </div>
+            <h3 className="text-xl font-bold text-center mb-1">ALEATÓRIOS FEST</h3>
+            <p className="text-sm text-gray-400 text-center mb-3">31 de Maio, 2025</p>
+            <p className="text-center mb-1">Chácara Monero, Osasco - SP</p>
+            <p className="text-center font-semibold text-neon-purple">
+              Ingresso #{selectedTicket?.ticket_number}
+            </p>
+            <div className="mt-4 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-900/30 text-green-400">
+              Válido
+            </div>
+          </div>
+          <DialogFooter>
+            <Button 
+              onClick={() => setShowTicketModal(false)}
+              className="bg-neon-blue hover:bg-neon-blue/80 text-black w-full"
+            >
+              Fechar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       
       <Footer />
     </div>

@@ -20,6 +20,7 @@ import AccessDenied from "./pages/AccessDenied";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminLandingPage from "./pages/AdminLandingPage";
 import PurchaseConfirmation from "./pages/PurchaseConfirmation";
 
 // Create a new QueryClient instance
@@ -70,6 +71,11 @@ const App = () => {
                 <Route path="/admin/dashboard" element={
                   <ProtectedRoute requireAdmin>
                     <AdminDashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin-landing" element={
+                  <ProtectedRoute requireAdmin>
+                    <AdminLandingPage />
                   </ProtectedRoute>
                 } />
                 <Route path="/access-denied" element={<AccessDenied />} />
