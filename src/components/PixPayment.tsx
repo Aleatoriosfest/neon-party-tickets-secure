@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -15,7 +14,7 @@ const PixPayment: React.FC = () => {
   const [phone, setPhone] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('pix');
   const [showQRCode, setShowQRCode] = useState(false);
-  const pixKey = 'beatrizsilva8282@gmail.com'; // Chave PIX fornecida
+  const pixKey = 'beatrizsilva8282@gmail.com'; // PIX key is correctly set
   
   // Check if user is logged in
   const currentUser = localStorage.getItem('currentUser') 

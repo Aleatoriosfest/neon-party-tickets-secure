@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
@@ -21,17 +21,33 @@ const Auth: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // If user is already logged in, redirect to appropriate page
   useEffect(() => {
     if (user) {
       if (user.role === 'admin') {
-        navigate('/admin/dashboard');
+        navigate('/admin-landing');
       } else {
-        navigate('/minha-conta');
+        const redirectPath = localStorage.getItem('redirectAfterLogin');
+        if (redirectPath && redirectPath !== '/auth') {
+          localStorage.removeItem('redirectAfterLogin');
+          navigate(redirectPath);
+        } else {
+          navigate('/minha-conta');
+        }
       }
     }
   }, [user, navigate]);
+
+  // Set redirect after login if it's in the URL params
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const redirect = searchParams.get('redirect');
+    if (redirect) {
+      localStorage.setItem('redirectAfterLogin', redirect);
+    }
+  }, [location]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

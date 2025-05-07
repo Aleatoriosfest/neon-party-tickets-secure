@@ -26,7 +26,7 @@ const UserTicketCard: React.FC<UserTicketCardProps> = ({ ticket, onViewTicket })
               Comprado em: {new Date(ticket.purchase_date).toLocaleDateString('pt-BR')}
             </p>
             <div className="mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-900/30 text-green-400">
-              {ticket.status === 'ativo' ? 'Ativo' : 'Usado'}
+              {ticket.status === 'ativo' ? 'Ativo' : ticket.status === 'usado' ? 'Usado' : 'Expirado'}
             </div>
           </div>
           

@@ -22,13 +22,14 @@ import Auth from "./pages/Auth";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminLandingPage from "./pages/AdminLandingPage";
 import PurchaseConfirmation from "./pages/PurchaseConfirmation";
+import QRCodeValidator from "./pages/QRCodeValidator";
 
 // Create a new QueryClient instance
 const queryClient = new QueryClient();
 
 const App = () => {
   useEffect(() => {
-    // Chamar a função setupAdmin quando o aplicativo é carregado
+    // Call the setupAdmin function when the app is loaded
     setupAdmin();
   }, []);
 
@@ -76,6 +77,11 @@ const App = () => {
                 <Route path="/admin-landing" element={
                   <ProtectedRoute requireAdmin>
                     <AdminLandingPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/qr-validator" element={
+                  <ProtectedRoute requireAdmin>
+                    <QRCodeValidator />
                   </ProtectedRoute>
                 } />
                 <Route path="/access-denied" element={<AccessDenied />} />

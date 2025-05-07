@@ -29,6 +29,24 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
+// Helper function to clean up auth state
+const cleanupAuthState = () => {
+  // Remove standard auth tokens
+  localStorage.removeItem('supabase.auth.token');
+  // Remove all Supabase auth keys from localStorage
+  Object.keys(localStorage).forEach((key) => {
+    if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+      localStorage.removeItem(key);
+    }
+  });
+  // Remove from sessionStorage if in use
+  Object.keys(sessionStorage || {}).forEach((key) => {
+    if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+      sessionStorage.removeItem(key);
+    }
+  });
+};
+
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -60,10 +78,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
               });
               
               // Redirect based on role
+              const redirectPath = localStorage.getItem('redirectAfterLogin');
+              
               if (userData.role === 'admin') {
-                navigate('/admin/dashboard');
+                navigate('/admin-landing');
+                toast.success('Bem-vindo ao painel de administração!');
               } else {
-                navigate('/minha-conta');
+                if (redirectPath && redirectPath !== '/auth') {
+                  localStorage.removeItem('redirectAfterLogin');
+                  navigate(redirectPath);
+                } else {
+                  navigate('/minha-conta');
+                }
+                toast.success('Login realizado com sucesso!');
               }
             }
           } catch (error) {
@@ -100,6 +127,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
               name: userData.name,
               role: userData.role as 'admin' | 'user',
             });
+            
+            // If we're on the auth page and already logged in, redirect based on role
+            if (window.location.pathname === '/auth') {
+              if (userData.role === 'admin') {
+                navigate('/admin-landing');
+              } else {
+                navigate('/minha-conta');
+              }
+            }
           }
         }
       } catch (error) {
@@ -122,6 +158,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const signIn = async (email: string, password: string) => {
     try {
       setLoading(true);
+      // Clean up existing state before login
+      cleanupAuthState();
+      
+      // Try global sign out first to prevent authentication limbo
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (err) {
+        // Continue even if this fails
+        console.log('Global sign out failed, continuing with sign in');
+      }
+      
       const { data, error } = await supabase.auth.signInWithPassword({ 
         email, 
         password 
@@ -131,10 +178,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         throw error;
       }
 
-      if (data?.user) {
-        // User data is set in the auth state change listener
-        toast.success('Login realizado com sucesso!');
-      }
+      // User data is set in the auth state change listener
+      // We don't need to do anything else here
     } catch (error: any) {
       console.error('Error signing in:', error);
       toast.error(error.message || 'Erro ao fazer login');
@@ -147,6 +192,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const signUp = async (email: string, password: string, name: string, role: 'user' | 'admin' = 'user') => {
     try {
       setLoading(true);
+      // Clean up existing state before signup
+      cleanupAuthState();
+      
       // Sign up the user with Supabase Auth
       const { data, error } = await supabase.auth.signUp({ 
         email, 
@@ -179,7 +227,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const signOut = async () => {
     try {
       setLoading(true);
-      await supabase.auth.signOut();
+      // Clean up auth state
+      cleanupAuthState();
+      
+      // Attempt global sign out
+      await supabase.auth.signOut({ scope: 'global' });
+      
       // State is cleaned up in the auth state change listener
       toast.info('Logout realizado com sucesso');
     } catch (error: any) {

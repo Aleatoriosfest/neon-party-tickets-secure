@@ -18,7 +18,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   useEffect(() => {
     if (!loading && !user) {
-      // Salvar a rota atual para redirecionar depois do login
+      // Save current route to redirect after login
       localStorage.setItem('redirectAfterLogin', location.pathname);
       toast.error('Acesso negado', {
         description: 'Faça login para acessar esta página'
@@ -30,7 +30,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     }
   }, [user, loading, location.pathname, requireAdmin]);
 
-  // Mostrar um indicador de carregamento enquanto verifica a autenticação
+  // Show loading indicator while checking authentication
   if (loading) {
     return (
       <div className="min-h-screen bg-dark flex items-center justify-center">
@@ -39,17 +39,17 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
   }
 
-  // Se o usuário não está autenticado, redirecionar para login
+  // If user not authenticated, redirect to login
   if (!user) {
-    return <Navigate to="/auth" state={{ from: location }} replace />;
+    return <Navigate to={`/auth?redirect=${encodeURIComponent(location.pathname)}`} replace />;
   }
 
-  // Se a rota requer privilégios de admin, verificar o papel do usuário
+  // If route requires admin privileges, verify user role
   if (requireAdmin && user.role !== 'admin') {
     return <Navigate to="/access-denied" replace />;
   }
 
-  // Usuário autenticado e com as permissões corretas
+  // User authenticated and with correct permissions
   return <>{children}</>;
 };
 

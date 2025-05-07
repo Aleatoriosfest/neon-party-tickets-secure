@@ -8,6 +8,7 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { toast } from '@/components/ui/sonner';
+import { QrCode, PlusCircle, Edit, Users } from 'lucide-react';
 
 const AdminLandingPage: React.FC = () => {
   const { user } = useAuth();
@@ -60,6 +61,7 @@ const AdminLandingPage: React.FC = () => {
                     variant="outline" 
                     className="border-[#0CF2F2] text-white h-16 text-lg font-medium hover:bg-[#0CF2F2]/20"
                   >
+                    <PlusCircle className="mr-2 h-5 w-5" />
                     Criar Novo Evento
                   </Button>
                   
@@ -67,6 +69,7 @@ const AdminLandingPage: React.FC = () => {
                     variant="outline" 
                     className="border-[#0CF2F2] text-white h-16 text-lg font-medium hover:bg-[#0CF2F2]/20"
                   >
+                    <Edit className="mr-2 h-5 w-5" />
                     Editar Evento
                   </Button>
                   
@@ -74,8 +77,19 @@ const AdminLandingPage: React.FC = () => {
                     variant="outline" 
                     className="border-[#0CF2F2] text-white h-16 text-lg font-medium hover:bg-[#0CF2F2]/20"
                   >
+                    <Users className="mr-2 h-5 w-5" />
                     Ver Compradores
                   </Button>
+                  
+                  <Link to="/admin/qr-validator">
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-[#9D4EDD] text-white h-16 text-lg font-medium hover:bg-[#9D4EDD]/20"
+                    >
+                      <QrCode className="mr-2 h-5 w-5" />
+                      Validar Ingressos
+                    </Button>
+                  </Link>
                   
                   <Link to="/">
                     <Button 
@@ -112,16 +126,11 @@ const AdminLandingPage: React.FC = () => {
                       <Button 
                         variant="outline" 
                         className="border-[#0CF2F2] text-white hover:bg-[#0CF2F2]/20"
+                        onClick={() => navigate('/admin/dashboard')}
                       >
                         Ver Mais
                       </Button>
                     </div>
-                  </div>
-
-                  <div className="p-4 border border-yellow-500/30 bg-yellow-900/10 rounded-lg">
-                    <p className="text-xl text-center text-white">
-                      Acesso negado. Área exclusiva para administradores.
-                    </p>
                   </div>
                 </CardContent>
               </Card>
