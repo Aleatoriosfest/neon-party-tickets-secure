@@ -14,17 +14,17 @@ import CountdownTimer from '@/components/CountdownTimer';
 import ArtistTimeline from '@/components/ArtistTimeline';
 import PhotoGallery from '@/components/PhotoGallery';
 
-// Restaurando todos os detalhes originais do evento Projeto X
+// Restaurando todos os detalhes originais do evento Aleatorios Fest
 const projectXEvent: EventType = {
   id: "1",
-  title: "PROJETO X",
-  subtitle: "A festa mais louca do ano",
+  title: "ALEATÓRIOS FEST",
+  subtitle: "Aleatorios Fest x Element's Fest",
   description: "Uma experiência única com os melhores DJs e atrações da cidade!",
   date: "31 de Maio, 2025",
   time: "16:00 às 00:00",
   location: "Chácara Monero, Osasco - SP",
   price: 30,
-  image_url: "/lovable-uploads/de50cc19-19d3-44a1-bf48-7a14dcc3a803.png",
+  image_url: "/lovable-uploads/7167fe07-a100-48a7-9d4e-ef3e91237dd1.png",
   ticketsAvailable: true,
   images: [],
   attractions: [
@@ -81,7 +81,7 @@ const EventDetail: React.FC = () => {
   const { user } = useAuth();
   
   useEffect(() => {
-    // Para agora, vamos sempre carregar o evento Projeto X
+    // Para agora, vamos sempre carregar o evento Aleatorios Fest
     setEvent(projectXEvent);
   }, [id]);
   

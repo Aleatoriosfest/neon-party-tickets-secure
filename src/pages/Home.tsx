@@ -8,14 +8,14 @@ import { Link } from 'react-router-dom';
 import { Calendar, MapPin } from 'lucide-react';
 
 const Home: React.FC = () => {
-  // Project X event data
+  // Updated Project X event data with correct information
   const projetoXEvent = {
     id: "1",
-    title: "PROJETO X",
-    date: "20 de Julho, 2025",
-    location: "Arena XYZ, São Paulo - SP",
-    image: "/lovable-uploads/de50cc19-19d3-44a1-bf48-7a14dcc3a803.png",
-    price: "R$50,00",
+    title: "ALEATÓRIOS FEST",
+    date: "31 de Maio, 2025",
+    location: "Chácara Monero, Osasco - SP",
+    image: "/lovable-uploads/7167fe07-a100-48a7-9d4e-ef3e91237dd1.png",
+    price: "R$30,00",
     category: "Festa"
   };
 
@@ -37,7 +37,7 @@ const Home: React.FC = () => {
               transition={{ duration: 0.7 }}
               className="text-3xl md:text-5xl font-bold mb-4 text-white"
             >
-              Bem-vindo ao <span className="neon-text">Projeto X</span>
+              Bem-vindo ao <span className="neon-text">Aleatórios Fest</span>
             </motion.h1>
             
             <motion.p
