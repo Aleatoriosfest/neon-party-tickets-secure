@@ -40,30 +40,44 @@ const App = () => {
           <MotionConfig reducedMotion="user">
             <AuthProvider>
               <Routes>
+                {/* Public routes */}
                 <Route path="/" element={<Home />} />
                 <Route path="/eventos" element={<Home />} />
                 <Route path="/eventos/:id" element={<EventDetail />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/access-denied" element={<AccessDenied />} />
+                <Route path="/politica-privacidade" element={<Home />} />
+                <Route path="/termos-uso" element={<Home />} />
+                <Route path="/sobre" element={<Home />} />
+                
+                {/* User protected routes */}
                 <Route path="/meus-ingressos" element={
                   <ProtectedRoute>
                     <MyTickets />
                   </ProtectedRoute>
                 } />
                 <Route path="/minha-conta" element={
-                  <ProtectedRoute>
+                  <ProtectedRoute requireUser>
                     <UserAccount />
                   </ProtectedRoute>
                 } />
                 <Route path="/minha-conta/email" element={
-                  <ProtectedRoute>
+                  <ProtectedRoute requireUser>
                     <UserAccount />
                   </ProtectedRoute>
                 } />
                 <Route path="/minha-conta/senha" element={
-                  <ProtectedRoute>
+                  <ProtectedRoute requireUser>
                     <UserAccount />
                   </ProtectedRoute>
                 } />
+                <Route path="/purchase-confirmation" element={
+                  <ProtectedRoute>
+                    <PurchaseConfirmation />
+                  </ProtectedRoute>
+                } />
+                
+                {/* Admin protected routes */}
                 <Route path="/admin" element={
                   <ProtectedRoute requireAdmin>
                     <Admin />
@@ -84,14 +98,12 @@ const App = () => {
                     <QRCodeValidator />
                   </ProtectedRoute>
                 } />
-                <Route path="/access-denied" element={<AccessDenied />} />
+                
+                {/* Payment routes */}
                 <Route path="/payment-success" element={<Home />} />
                 <Route path="/payment-canceled" element={<Home />} />
-                <Route path="/purchase-confirmation" element={<PurchaseConfirmation />} />
-                <Route path="/politica-privacidade" element={<Home />} />
-                <Route path="/termos-uso" element={<Home />} />
-                <Route path="/sobre" element={<Home />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                
+                {/* Catch-all route */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
               <Toaster />

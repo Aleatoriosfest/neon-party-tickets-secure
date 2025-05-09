@@ -6,48 +6,57 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { AlertCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/components/ui/sonner';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const Auth: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
+  const [activeTab, setActiveTab] = useState<'login' | 'register' | 'reset'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [resetEmail, setResetEmail] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
-  const { signIn, signUp, user } = useAuth();
+  const [showResetSuccess, setShowResetSuccess] = useState(false);
+  const { signIn, signUp, user, resetPassword } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // If user is already logged in, redirect to appropriate page
+  // Extract redirect path from URL if present
+  const searchParams = new URLSearchParams(location.search);
+  const redirect = searchParams.get('redirect');
+  const isResetFlow = searchParams.get('reset') === 'true';
+
+  // Check if user is already logged in
   useEffect(() => {
     if (user) {
       if (user.role === 'admin') {
         navigate('/admin-landing');
       } else {
-        const redirectPath = localStorage.getItem('redirectAfterLogin');
-        if (redirectPath && redirectPath !== '/auth') {
-          localStorage.removeItem('redirectAfterLogin');
-          navigate(redirectPath);
-        } else {
-          navigate('/minha-conta');
-        }
+        const redirectPath = redirect || '/minha-conta';
+        navigate(redirectPath);
       }
     }
-  }, [user, navigate]);
+  }, [user, navigate, redirect]);
 
   // Set redirect after login if it's in the URL params
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const redirect = searchParams.get('redirect');
     if (redirect) {
       localStorage.setItem('redirectAfterLogin', redirect);
     }
-  }, [location]);
+  }, [redirect]);
+
+  // Show reset password tab if URL contains reset=true
+  useEffect(() => {
+    if (isResetFlow) {
+      setActiveTab('reset');
+    }
+  }, [isResetFlow]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,6 +99,20 @@ const Auth: React.FC = () => {
     }
   };
 
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsProcessing(true);
+    
+    try {
+      await resetPassword(resetEmail);
+      setShowResetSuccess(true);
+    } catch (error) {
+      console.error('Password reset error:', error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   // Key fix: Use proper cleanup in useEffect and handle tab transitions more carefully
   const animationVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -113,19 +136,26 @@ const Auth: React.FC = () => {
           <Card className="bg-dark-gray border-light-gray shadow-lg neon-blue-border">
             <CardHeader className="space-y-1">
               <CardTitle className="text-2xl font-bold text-white neon-text">
-                {activeTab === 'login' ? 'Entrar' : 'Criar Conta'}
+                {activeTab === 'login' 
+                  ? 'Entrar' 
+                  : activeTab === 'register' 
+                    ? 'Criar Conta'
+                    : 'Redefinir Senha'}
               </CardTitle>
               <CardDescription className="text-gray-400">
                 {activeTab === 'login' 
                   ? 'Entre com suas credenciais para acessar sua conta' 
-                  : 'Preencha o formulário para criar sua nova conta'}
+                  : activeTab === 'register'
+                    ? 'Preencha o formulário para criar sua nova conta'
+                    : 'Informe seu email para receber um link de redefinição de senha'}
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'login' | 'register')} className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-6">
+              <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'login' | 'register' | 'reset')} className="w-full">
+                <TabsList className="grid w-full grid-cols-3 mb-6">
                   <TabsTrigger value="login" className="text-white">Login</TabsTrigger>
                   <TabsTrigger value="register" className="text-white">Criar Conta</TabsTrigger>
+                  <TabsTrigger value="reset" className="text-white">Recuperar</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="login">
@@ -168,6 +198,15 @@ const Auth: React.FC = () => {
                       {isProcessing ? 'Processando...' : 'Entrar'}
                     </Button>
                   </form>
+
+                  <div className="mt-4 text-center">
+                    <button 
+                      onClick={() => setActiveTab('reset')} 
+                      className="text-neon-blue hover:underline text-sm"
+                    >
+                      Esqueci minha senha
+                    </button>
+                  </div>
                 </TabsContent>
                 
                 <TabsContent value="register">
@@ -229,6 +268,52 @@ const Auth: React.FC = () => {
                       {isProcessing ? 'Processando...' : 'Criar Conta'}
                     </Button>
                   </form>
+                </TabsContent>
+
+                <TabsContent value="reset">
+                  {showResetSuccess ? (
+                    <Alert className="bg-green-900/30 border-green-700 text-white mb-4">
+                      <AlertCircle className="h-4 w-4 text-green-400" />
+                      <AlertDescription className="text-green-300">
+                        Email de recuperação enviado. Verifique sua caixa de entrada e siga as instruções.
+                      </AlertDescription>
+                    </Alert>
+                  ) : (
+                    <form onSubmit={handleResetPassword} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="reset-email">Email</Label>
+                        <Input
+                          id="reset-email"
+                          type="email"
+                          value={resetEmail}
+                          onChange={(e) => setResetEmail(e.target.value)}
+                          placeholder="seu@email.com"
+                          className="bg-gray-800 border-gray-700 focus:border-neon-blue"
+                          required
+                        />
+                      </div>
+
+                      <Button 
+                        type="submit"
+                        disabled={isProcessing} 
+                        className="w-full bg-neon-blue hover:bg-neon-blue/80 text-black"
+                      >
+                        {isProcessing ? 'Processando...' : 'Enviar Email de Recuperação'}
+                      </Button>
+                    </form>
+                  )}
+
+                  <div className="mt-4 text-center">
+                    <button 
+                      onClick={() => {
+                        setActiveTab('login');
+                        setShowResetSuccess(false);
+                      }} 
+                      className="text-neon-blue hover:underline text-sm"
+                    >
+                      Voltar para o login
+                    </button>
+                  </div>
                 </TabsContent>
               </Tabs>
             </CardContent>

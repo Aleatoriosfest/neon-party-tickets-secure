@@ -15,6 +15,32 @@ interface UserTicketCardProps {
 }
 
 const UserTicketCard: React.FC<UserTicketCardProps> = ({ ticket, onViewTicket }) => {
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'ativo':
+      case 'valid':
+        return 'Ativo';
+      case 'usado':
+      case 'used':
+        return 'Usado';
+      default:
+        return 'Expirado';
+    }
+  };
+
+  const getStatusClass = (status: string) => {
+    switch (status) {
+      case 'ativo':
+      case 'valid':
+        return 'bg-green-900/30 text-green-400';
+      case 'usado':
+      case 'used':
+        return 'bg-orange-900/30 text-orange-400';
+      default:
+        return 'bg-red-900/30 text-red-400';
+    }
+  };
+
   return (
     <Card className="bg-dark-gray border-light-gray text-white">
       <CardContent className="p-4">
@@ -25,8 +51,8 @@ const UserTicketCard: React.FC<UserTicketCardProps> = ({ ticket, onViewTicket })
             <p className="text-gray-400 text-sm">
               Comprado em: {new Date(ticket.purchase_date).toLocaleDateString('pt-BR')}
             </p>
-            <div className="mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-900/30 text-green-400">
-              {ticket.status === 'ativo' ? 'Ativo' : ticket.status === 'usado' ? 'Usado' : 'Expirado'}
+            <div className={`mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusClass(ticket.status)}`}>
+              {getStatusText(ticket.status)}
             </div>
           </div>
           

@@ -13,6 +13,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, name: string, role: 'user' | 'admin') => Promise<void>;
   signOut: () => Promise<void>;
   isAdmin: boolean;
+  resetPassword: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -84,7 +85,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                 navigate('/admin-landing');
                 toast.success('Bem-vindo ao painel de administração!');
               } else {
-                if (redirectPath && redirectPath !== '/auth') {
+                if (redirectPath && redirectPath !== '/auth' && redirectPath !== '/') {
                   localStorage.removeItem('redirectAfterLogin');
                   navigate(redirectPath);
                 } else {
@@ -243,6 +244,29 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
+  // Add password reset functionality
+  const resetPassword = async (email: string) => {
+    try {
+      setLoading(true);
+      
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth?reset=true`,
+      });
+      
+      if (error) throw error;
+      
+      toast.success('Email de recuperação enviado', {
+        description: 'Verifique sua caixa de entrada para redefinir sua senha.'
+      });
+      
+    } catch (error: any) {
+      console.error('Password reset error:', error);
+      toast.error(error.message || 'Erro ao solicitar redefinição de senha');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -253,6 +277,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         signUp,
         signOut,
         isAdmin: user?.role === 'admin',
+        resetPassword,
       }}
     >
       {children}

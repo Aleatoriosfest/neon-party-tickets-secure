@@ -7,28 +7,41 @@ import { toast } from '@/components/ui/sonner';
 interface ProtectedRouteProps {
   children: ReactNode;
   requireAdmin?: boolean;
+  requireUser?: boolean;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
   children,
-  requireAdmin = false
+  requireAdmin = false,
+  requireUser = false
 }) => {
   const { user, session, loading } = useAuth();
   const location = useLocation();
 
   useEffect(() => {
-    if (!loading && !user) {
-      // Save current route to redirect after login
-      localStorage.setItem('redirectAfterLogin', location.pathname);
-      toast.error('Acesso negado', {
-        description: 'Faça login para acessar esta página'
-      });
-    } else if (!loading && requireAdmin && user?.role !== 'admin') {
-      toast.error('Acesso negado', {
-        description: 'Você não tem permissão para acessar esta página'
-      });
+    if (!loading) {
+      // User is not authenticated
+      if (!user) {
+        // Save current route to redirect after login
+        localStorage.setItem('redirectAfterLogin', location.pathname);
+        toast.error('Acesso negado', {
+          description: 'Faça login para acessar esta página'
+        });
+      } 
+      // User is authenticated but doesn't have admin privileges but route requires it
+      else if (requireAdmin && user.role !== 'admin') {
+        toast.error('Acesso negado', {
+          description: 'Você não tem permissão para acessar esta página'
+        });
+      }
+      // User is authenticated but doesn't have user role when route requires it
+      else if (requireUser && user.role !== 'user') {
+        toast.error('Acesso negado', {
+          description: 'Esta página é apenas para usuários'
+        });
+      }
     }
-  }, [user, loading, location.pathname, requireAdmin]);
+  }, [user, loading, location.pathname, requireAdmin, requireUser]);
 
   // Show loading indicator while checking authentication
   if (loading) {
@@ -39,13 +52,18 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
   }
 
-  // If user not authenticated, redirect to login
+  // If user not authenticated, redirect to login with return URL
   if (!user) {
     return <Navigate to={`/auth?redirect=${encodeURIComponent(location.pathname)}`} replace />;
   }
 
   // If route requires admin privileges, verify user role
   if (requireAdmin && user.role !== 'admin') {
+    return <Navigate to="/access-denied" replace />;
+  }
+
+  // If route requires user role, verify user role
+  if (requireUser && user.role !== 'user') {
     return <Navigate to="/access-denied" replace />;
   }
 

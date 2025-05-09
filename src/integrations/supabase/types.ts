@@ -63,9 +63,12 @@ export type Database = {
           id: string
           price: number
           purchase_date: string
+          "Qr code": string | null
           quantity: number
           status: string
+          Ticket_name: string | null
           ticket_number: string
+          Ticket_type: string | null
           user_id: string
         }
         Insert: {
@@ -73,9 +76,12 @@ export type Database = {
           id?: string
           price?: number
           purchase_date?: string
+          "Qr code"?: string | null
           quantity?: number
           status: string
+          Ticket_name?: string | null
           ticket_number: string
+          Ticket_type?: string | null
           user_id: string
         }
         Update: {
@@ -83,33 +89,33 @@ export type Database = {
           id?: string
           price?: number
           purchase_date?: string
+          "Qr code"?: string | null
           quantity?: number
           status?: string
+          Ticket_name?: string | null
           ticket_number?: string
+          Ticket_type?: string | null
           user_id?: string
         }
         Relationships: []
       }
-      usuarios: {
+      users: {
         Row: {
           created_at: string
           email: string
           id: string
-          name: string
           role: string
         }
         Insert: {
           created_at?: string
           email: string
-          id: string
-          name: string
+          id?: string
           role: string
         }
         Update: {
           created_at?: string
           email?: string
           id?: string
-          name?: string
           role?: string
         }
         Relationships: []
